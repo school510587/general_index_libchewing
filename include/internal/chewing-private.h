@@ -68,17 +68,26 @@ typedef union {
 	uint16_t wch;
 } wch_t;
 
+/*
+ * This structure may represent both internal nodes and leaf nodes of a phrase
+ * tree. Two kinds are distinguished by whether key is 0. For an internal node,
+ * child.begin and child.end give a list of children in the position
+ * [child.begin, child.end). For a leaf node, phrase.pos offers the position
+ * of the phrase in system dictionary, and phrase.freq offers frequency of this
+ * phrase using a specific input method (may be bopomofo or non-phone). Note
+ * that key in root represents the number of total elements(nodes) in the tree.
+ */
 typedef struct {
-        uint32_t key;
-        union{
-                struct{
-                        int begin, end;
-                } child;
-                struct {
-                        long pos;
-                        int freq;
-                } phrase;
-        };
+	uint32_t key;
+	union{
+		struct{
+			int begin, end;
+		} child;
+		struct {
+			long pos;
+			int freq;
+		} phrase;
+	};
 } TreeType;
 
 typedef struct {
