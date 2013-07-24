@@ -65,9 +65,16 @@ typedef union {
 } wch_t;
 
 typedef struct {
-	uint16_t phone_id;
-	int phrase_id;
-	int child_begin, child_end;
+        uint32_t key;
+        union{
+                struct{
+                        int begin, end;
+                } child;
+                struct {
+                        long pos;
+                        int freq;
+                } phrase;
+        };
 } TreeType;
 
 typedef struct {
