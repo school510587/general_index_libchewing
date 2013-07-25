@@ -13,8 +13,8 @@
 #ifndef _CHEWING_GLOBAL_PRIVATE_H
 #define _CHEWING_GLOBAL_PRIVATE_H
 
-#define PHONE_TREE_FILE		"fonetree.dat"
-#define DICT_FILE		"dict.dat"
+#define PHONE_TREE_FILE		"index_tree.dat"
+#define DICT_FILE		"dictionary.dat"
 #define PH_INDEX_FILE		"ph_index.dat"
 #define CHAR_FILE		"us_freq.dat"
 #define CHAR_INDEX_FILE		"ch_index.dat"

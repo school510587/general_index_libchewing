@@ -108,8 +108,8 @@ set(INFO_SRC ${PROJECT_SOURCE_DIR}/doc/libchewing.texi)
 set(INFO_BIN ${PROJECT_BINARY_DIR}/doc/libchewing.info)
 
 set(ALL_DATA
-	${DATA_BIN_DIR}/dict.dat
-	${DATA_BIN_DIR}/fonetree.dat
+	${DATA_BIN_DIR}/dictionary.dat
+	${DATA_BIN_DIR}/index_tree.dat
 )
 
 set(ALL_INC
