@@ -8,14 +8,12 @@ INCLUDES = \
 CC = $(CC_FOR_BUILD)
 AM_CFLAGS = $(CFLAGS_FOR_BUILD)
 
-noinst_PROGRAMS = sort maketree
+noinst_PROGRAMS = init_database
 
-sort_SOURCES = \
-	sort.c \
+init_database_SOURCES = \
+	init_database.c \
 	$(NULL)
 
-sort_LDADD = \
+init_database_LDADD = \
 	$(top_builddir)/src/common/libcommon.la \
 	$(NULL)
-
-maketree_SOURCES = maketree.c
