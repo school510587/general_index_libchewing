@@ -165,9 +165,7 @@ typedef struct _SymbolEntry {
 typedef struct {
 	TreeType *tree;
 	size_t tree_size;
-#ifdef USE_BINARY_DATA
 	plat_mmap tree_mmap;
-#endif
 
 	uint16_t *arrPhone;
 	int *char_begin;
