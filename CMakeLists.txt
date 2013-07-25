@@ -115,21 +115,7 @@ set(INFO_BIN ${PROJECT_BINARY_DIR}/doc/libchewing.info)
 set(ALL_DATA
 	${DATA_BIN_DIR}/dict.dat
 	${DATA_BIN_DIR}/fonetree.dat
-	${DATA_BIN_DIR}/ph_index.dat
-	${DATA_BIN_DIR}/us_freq.dat
 )
-
-if (USE_BINARY_DATA)
-	list(APPEND ALL_DATA
-		${DATA_BIN_DIR}/ch_index_begin.dat
-		${DATA_BIN_DIR}/ch_index_phone.dat
-	)
-else()
-	list(APPEND ALL_DATA
-		${DATA_BIN_DIR}/ch_index.dat
-	)
-endif()
-
 
 set(ALL_INC
 	${INC_DIR}/chewing.h
