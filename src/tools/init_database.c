@@ -444,15 +444,9 @@ void write_index_tree()
         int head=0, tail=0, tree_size=1;
 
         FILE *output = fopen(PHONE_TREE_FILE, "wb");
-        FILE *config = fopen(CHEWING_DEFINITION_FILE, "a");
 
         if ( ! output ) {
                 fprintf( stderr, "Error opening file " PHONE_TREE_FILE " for output.\n" );
-                exit( 1 );
-        }
-
-        if ( ! config ) {
-                fprintf( stderr, "Error opening file " CHEWING_DEFINITION_FILE " for output.\n" );
                 exit( 1 );
         }
 
@@ -498,9 +492,7 @@ void write_index_tree()
         }
         free(queue);
 
-        fprintf( config, "#define TREE_SIZE (%d)\n", tree_size );
         fclose( output );
-        fclose( config );
 }
 
 int main(int argc, char *argv[])
