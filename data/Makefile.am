@@ -1,7 +1,7 @@
 tooldir = $(top_builddir)/src/tools
 datas = \
-	dict.dat \
-	fonetree.dat \
+	dictionary.dat \
+	index_tree.dat \
 	$(NULL)
 static_tables = pinyin.tab swkb.dat symbols.dat
 generated_header = $(top_builddir)/src/chewing-definition.h
