@@ -32,7 +32,7 @@ gendata_stamp: phone.cin tsi.src
 	touch $@
 
 gendata:
-	env LC_ALL=C $(tooldir)/sort$(EXEEXT) $(top_srcdir)/data/phone.cin $(top_srcdir)/data/tsi.src
+	env LC_ALL=C $(tooldir)/init_database$(EXEEXT) $(top_srcdir)/data/phone.cin $(top_srcdir)/data/tsi.src
 	$(tooldir)/maketree$(EXEEXT)
 	-rm -f phoneid.dic
 	-mv -f chewing-definition.h $(generated_header)
