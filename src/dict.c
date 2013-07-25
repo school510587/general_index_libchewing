@@ -53,22 +53,11 @@ static char *fgettab( char *buf, int maxlen, FILE *fp )
 
 void TerminateDict( ChewingData *pgdata )
 {
-#ifdef USE_BINARY_DATA
-	plat_mmap_close( &pgdata->static_data.index_mmap );
 	plat_mmap_close( &pgdata->static_data.dict_mmap );
-#else
-	if ( pgdata->static_data.dictfile ) {
-		fclose( pgdata->static_data.dictfile );
-		pgdata->static_data.dictfile = NULL;
-	}
-	free( pgdata->static_data.dict_begin );
-	pgdata->static_data.dict_begin = NULL;
-#endif
 }
 
 int InitDict( ChewingData *pgdata, const char *prefix )
 {
-#ifdef USE_BINARY_DATA
 	char filename[ PATH_MAX ];
 	size_t len;
 	size_t offset;
@@ -90,56 +79,7 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 	if ( !pgdata->static_data.dict )
 		return -1;
 
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, PH_INDEX_FILE );
-	if ( len + 1 > sizeof( filename ) )
-		return -1;
-
-	plat_mmap_set_invalid( &pgdata->static_data.index_mmap );
-	file_size = plat_mmap_create( &pgdata->static_data.index_mmap, filename, FLAG_ATTRIBUTE_READ );
-	if ( file_size <= 0 )
-		return -1;
-
-	offset = 0;
-	csize = file_size;
-	pgdata->static_data.dict_begin = plat_mmap_set_view( &pgdata->static_data.index_mmap, &offset, &csize );
-	if ( !pgdata->static_data.dict_begin )
-		return -1;
-
 	return 0;
-#else
-	char filename[ PATH_MAX ];
-	FILE *indexfile;
-	int len;
-	int i;
-
-	pgdata->static_data.dict_begin = ALC( int, PHONE_PHRASE_NUM + 1 );
-	if ( !pgdata->static_data.dict_begin )
-		return -1;
-
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, DICT_FILE );
-	if ( len + 1 > sizeof( filename ) )
-		return -1;
-
-	pgdata->static_data.dictfile = fopen( filename, "r" );
-	if ( !pgdata->static_data.dictfile )
-		return -1;
-
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, PH_INDEX_FILE );
-	if ( len + 1 > sizeof( filename ) )
-		return -1;
-
-	indexfile = fopen( filename, "r" );
-	if ( !indexfile )
-		return -1;
-
-	i = 0;
-	/* FIXME: check if begin is big enough to store all data. */
-	while ( !feof( indexfile ) )
-		fscanf( indexfile, "%d", &pgdata->static_data.dict_begin[ i++ ] );
-	fclose( indexfile );
-
-	return 0;
-#endif
 }
 
 static void Str2Phrase( ChewingData *pgdata, Phrase *phr_ptr )
