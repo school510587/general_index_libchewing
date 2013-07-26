@@ -182,7 +182,7 @@ typedef struct {
 	FILE *charfile;
 #endif
 
-	void *dict;
+	const char *dict;
 	plat_mmap dict_mmap;
 
 	int chewing_lifetime;
