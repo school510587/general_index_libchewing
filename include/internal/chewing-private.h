@@ -174,7 +174,7 @@ typedef struct {
 	plat_mmap char_begin_mmap;
 	plat_mmap char_phone_mmap;
 
-	void *dict;
+	const char *dict;
 	plat_mmap dict_mmap;
 
 	int chewing_lifetime;
