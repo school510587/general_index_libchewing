@@ -84,21 +84,10 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 
 static void Str2Phrase( ChewingData *pgdata, Phrase *phr_ptr )
 {
-#ifndef USE_BINARY_DATA
-	char buf[ 1000 ];
-
-	fgettab( buf, 1000, pgdata->static_data.dictfile );
-	sscanf( buf, "%[^ ] %d", phr_ptr->phrase, &( phr_ptr->freq ) );
-#else
-	unsigned char size;
-	size = *(unsigned char *) pgdata->static_data.dict_cur_pos;
-	pgdata->static_data.dict_cur_pos = (unsigned char *)pgdata->static_data.dict_cur_pos + sizeof(unsigned char);
-	memcpy( phr_ptr->phrase, pgdata->static_data.dict_cur_pos, size );
-	pgdata->static_data.dict_cur_pos = (unsigned char *)pgdata->static_data.dict_cur_pos + size;
-	phr_ptr->freq = GetInt32(pgdata->static_data.dict_cur_pos);
-	pgdata->static_data.dict_cur_pos = (unsigned char *)pgdata->static_data.dict_cur_pos + sizeof(int);
-	phr_ptr->phrase[ size ] = '\0';
-#endif
+	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ];
+	strcpy(phr_ptr->phrase, pgdata->static_data.dict + pLeaf->phrase.pos);
+	phr_ptr->freq = pLeaf->phrase.freq;
+	pgdata->static_data.tree_cur_pos++;
 }
 
 /*
