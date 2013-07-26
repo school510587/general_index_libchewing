@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "global-private.h"
-#include "chewing-definition.h"
 #include "char-private.h"
 #include "private.h"
 #include "plat_mmap.h"
