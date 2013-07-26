@@ -162,6 +162,7 @@ typedef struct {
 	TreeType *tree;
 	size_t tree_size;
 	plat_mmap tree_mmap;
+	int tree_cur_pos, tree_end_pos;
 
 	uint16_t *arrPhone;
 	int *char_begin;
@@ -172,9 +173,6 @@ typedef struct {
 	plat_mmap char_mmap;
 	plat_mmap char_begin_mmap;
 	plat_mmap char_phone_mmap;
-
-	void *dict_cur_pos;
-	int dict_end_pos;
 
 	void *dict;
 	plat_mmap dict_mmap;
