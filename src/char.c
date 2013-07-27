@@ -92,13 +92,9 @@ int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
 
 int GetCharNext( ChewingData *pgdata, Word *wrd_ptr )
 {
-#ifndef USE_BINARY_DATA
-	if ( ftell( pgdata->static_data.charfile ) >= pgdata->static_data.char_end_pos )
+	if ( pgdata->static_data.char_cur_pos >= pgdata->static_data.char_end_pos
+		|| pgdata->static_data.tree[ pgdata->static_data.char_cur_pos ].key != 0)
 		return 0;
-#else
-	if ( (unsigned char*)pgdata->static_data.char_cur_pos >= (unsigned char*)pgdata->static_data.char_ + pgdata->static_data.char_end_pos )
-		return 0;
-#endif
 	Str2Word( pgdata, wrd_ptr );
 	return 1;
 }
