@@ -67,22 +67,9 @@ int InitChar( ChewingData *pgdata , const char * prefix )
  */
 static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
 {
-#ifndef USE_BINARY_DATA
-	char buf[ 1000 ];
-	uint16_t sh;
-
-	fgettab( buf, 1000, pgdata->static_data.charfile );
-	/* only read 6 bytes to wrd_ptr->word avoid buffer overflow */
-	sscanf( buf, "%hu %6[^ ]", &sh, wrd_ptr->word );
-	assert( wrd_ptr->word[0] != '\0' );
-#else
-	unsigned char size;
-	size = *(unsigned char *) pgdata->static_data.char_cur_pos;
-	pgdata->static_data.char_cur_pos = (unsigned char*) pgdata->static_data.char_cur_pos + sizeof(unsigned char);
-	memcpy( wrd_ptr->word, pgdata->static_data.char_cur_pos, size );
-	pgdata->static_data.char_cur_pos = (unsigned char*) pgdata->static_data.char_cur_pos + size;
-	wrd_ptr->word[ size ] = '\0';
-#endif
+	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.char_cur_pos ];
+	strcpy(wrd_ptr->word, pgdata->static_data.dict + pLeaf->phrase.pos);
+	pgdata->static_data.char_cur_pos++;
 }
 
 int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t phoneid )
