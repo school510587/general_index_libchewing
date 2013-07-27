@@ -74,9 +74,10 @@ static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
 
 int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
 {
-	const TreeType *pinx, tmpNode = {0};
+	const TreeType *pinx;
+	TreeType keyNode = {0};
 
-	tmpNode.key=key;
+	keyNode.key = key;
 	pinx = (const TreeType*) bsearch(
 		&keyNode, pgdata->static_data.tree + pgdata->static_data.tree[0].child.begin,
 		pgdata->static_data.tree[0].child.end - pgdata->static_data.tree[0].child.begin,
