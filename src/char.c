@@ -61,6 +61,10 @@ int InitChar( ChewingData *pgdata , const char * prefix )
 	return 0;
 }
 
+/*
+ * The function gets string of a Chinese character from dictionary, and stores
+ * it into buffer given by wrd_ptr.
+ */
 static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
 {
 #ifndef USE_BINARY_DATA
