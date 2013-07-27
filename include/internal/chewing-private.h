@@ -164,12 +164,7 @@ typedef struct {
 	plat_mmap tree_mmap;
 	int tree_cur_pos, tree_end_pos;
 
-	uint16_t *arrPhone;
-	int *char_begin;
-	size_t phone_num;
-	void *char_;
-	void *char_cur_pos;
-	int char_end_pos;
+	int char_cur_pos, char_end_pos;
 
 	const char *dict;
 	plat_mmap dict_mmap;
