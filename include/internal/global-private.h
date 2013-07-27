@@ -15,11 +15,6 @@
 
 #define PHONE_TREE_FILE		"index_tree.dat"
 #define DICT_FILE		"dictionary.dat"
-#define PH_INDEX_FILE		"ph_index.dat"
-#define CHAR_FILE		"us_freq.dat"
-#define CHAR_INDEX_FILE		"ch_index.dat"
-#define CHAR_INDEX_BEGIN_FILE	"ch_index_begin.dat"
-#define CHAR_INDEX_PHONE_FILE	"ch_index_phone.dat"
 #define SYMBOL_TABLE_FILE	"symbols.dat"
 #define SOFTKBD_TABLE_FILE	"swkb.dat"
 #define CHEWING_DEFINITION_FILE "chewing-definition.h"
