@@ -264,7 +264,10 @@ int TreeFindPhrase( ChewingData *pgdata, int begin, int end, const uint16_t *pho
 			tree_p = child;
 		}
 	}
-	return tree_p;
+	/* If its child has no key value of 0, then it is only a "half" phrase. */
+	child = pgdata->static_data.tree[ tree_p ].child.begin;
+	if( pgdata->static_data.tree[ child ].key != 0) return -1;
+	else return tree_p;
 }
 
 static void AddInterval(
