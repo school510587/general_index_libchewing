@@ -278,11 +278,7 @@ void store_word(const char *line, const int line_num)
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
 	word_data[num_word_data].str_data.phone[0] = UintFromPhone(phone_buf);
 
-	/* FIXME
-	 * Here, check if the word with this phone exists in phrase dictionary.
-	 * If it is guaranteed that each word exists in phrase dictionary with
-	 * phones listed in phone.cin, the step can be ignored.
-	 */
+	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
 }
 
