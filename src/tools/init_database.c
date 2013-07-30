@@ -121,6 +121,7 @@ int compare_word(const void *x, const void *y)
 
 void store_phrase(const char *line, int line_num)
 {
+	PhraseData tmp_phr;                                                     
 	const char DELIM[] = " \t\n";
 	char buf[MAX_LINE_LEN];
 	char *phrase;
@@ -129,8 +130,6 @@ void store_phrase(const char *line, int line_num)
 	size_t phrase_len;
 	size_t i;
 	size_t j;
-	PhraseData word;
-	char bopomofo_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 
 	strncpy(buf, line, sizeof(buf));
 
@@ -138,18 +137,13 @@ void store_phrase(const char *line, int line_num)
 	if (strlen(buf) == 0)
 		return;
 
-	if (num_phrase_data >= MAX_PHRASE_DATA) {
-		fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
-		exit(-1);
-	}
-
 	/* read phrase */
 	phrase = strtok(buf, DELIM);
 	if (!phrase) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
-	strncpy(phrase_data[num_phrase_data].phrase, phrase, sizeof(phrase_data[0].phrase));
+	strncpy(tmp_phr.phrase, phrase, sizeof(tmp_phr.phrase));
 
 	/* read frequency */
 	freq = strtok(NULL, DELIM);
@@ -159,7 +153,7 @@ void store_phrase(const char *line, int line_num)
 	}
 
 	errno = 0;
-	phrase_data[num_phrase_data].freq = strtol(freq, 0, 0);
+	tmp_phr.freq = strtol(freq, 0, 0);
 	if (errno) {
 		fprintf(stderr, "Error reading frequency `%s' in line %d, `%s'\n", freq, line_num, line);
 		exit(-1);
@@ -170,8 +164,8 @@ void store_phrase(const char *line, int line_num)
 		bopomofo && phrase_len < MAX_PHRASE_LEN;
 		bopomofo = strtok(NULL, DELIM), ++phrase_len) {
 
-		phrase_data[num_phrase_data].phone[phrase_len] = UintFromPhone(bopomofo);
-		if (phrase_data[num_phrase_data].phone[phrase_len] == 0) {
+		tmp_phr.phone[phrase_len] = UintFromPhone(bopomofo);
+		if (tmp_phr.phone[phrase_len] == 0) {
 			fprintf(stderr, "Error reading bopomofo `%s' in line %d, `%s'\n", bopomofo, line_num, line);
 			exit(-1);
 		}
@@ -181,12 +175,27 @@ void store_phrase(const char *line, int line_num)
 	}
 
 	/* check phrase length & bopomofo length */
-	if ((size_t)ueStrLen(phrase_data[num_phrase_data].phrase) != phrase_len) {
+	if ((size_t)ueStrLen(tmp_phr.phrase) != phrase_len) {
 		fprintf(stderr, "Phrase length and bopomofo length mismatch in line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 
-	++num_phrase_data;
+	if(phrase_len > 1) {
+		if (num_phrase_data >= MAX_PHRASE_DATA) {
+			fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
+			exit(-1);
+		}
+		memcpy(&phrase_data[num_phrase_data], &tmp_phr, sizeof(tmp_phr));
+		++num_phrase_data;
+	}
+	else {
+		PhraseData *pWord;
+		pWord=(PhraseData*)bsearch(&tmp_phr, word_data, num_word_data, sizeof(PhraseData), compare_word);
+		if( pWord ){
+			pWord->freq = tmp_phr.freq;
+		}
+		else fprintf(stderr, "Warning: '%s' in phrase source is not in word source.\n", tmp_phr.phrase);
+	}
 }
 
 int compare_phrase(const void *x, const void *y)
@@ -322,6 +331,8 @@ void read_phone_cin(const char *filename)
 			store_word(buf, line_num);
 	}
 	fclose(phone_cin);
+
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word);
 }
 
 NODE *new_node( uint32_t key )
