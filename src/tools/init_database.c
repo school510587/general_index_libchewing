@@ -57,11 +57,6 @@ const char USAGE[] =
 	"* " DICT_FILE "\n\tmain phrase file\n"
 ;
 
-typedef struct {
-	uint16_t phone;
-	char word[MAX_UTF8_SIZE + 1];
-} WordData;
-
 /* An additional pos helps avoid duplicate Chinese strings. */
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
@@ -82,11 +77,8 @@ typedef struct _tNODE {
 	struct _tNODE *pFirstChild, *pNextSibling;
 } NODE;
 
-WordData word_data[MAX_WORD_DATA];
-int num_word_data = 0;
-
-PhraseData phrase_data[MAX_PHRASE_DATA];
-int num_phrase_data = 0;
+PhraseData word_data[MAX_WORD_DATA], phrase_data[MAX_PHRASE_DATA];
+int num_word_data = 0, num_phrase_data = 0;
 
 NODE *root;
 
@@ -113,16 +105,16 @@ void strip(char *line)
 
 int compare_word(const void *x, const void *y)
 {
-	const WordData *a = (const WordData *)x;
-	const WordData *b = (const WordData *)y;
+	const PhraseData *a = (const PhraseData *)x;
+	const PhraseData *b = (const PhraseData *)y;
 	int ret;
 
-	ret = strcmp(a->word, b->word);
+	ret = strcmp(a->phrase, b->phrase);
 	if (ret != 0)
 		return ret;
 
-	if (a->phone != b->phone)
-		return a->phone - b->phone;
+	if (a->phone[0] != b->phone[0])
+		return a->phone[0] - b->phone[0];
 
 	return 0;
 }
@@ -137,7 +129,7 @@ void store_phrase(const char *line, int line_num)
 	size_t phrase_len;
 	size_t i;
 	size_t j;
-	WordData word;
+	PhraseData word;
 	char bopomofo_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 
 	strncpy(buf, line, sizeof(buf));
@@ -259,14 +251,14 @@ void store_word(const char *line, const int line_num)
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].word);
+		key_buf, word_data[num_word_data].phrase);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].phone = UintFromPhone(phone_buf);
+	word_data[num_word_data].phone[0] = UintFromPhone(phone_buf);
 
 	/* FIXME
 	 * Here, check if the word with this phone exists in phrase dictionary.
