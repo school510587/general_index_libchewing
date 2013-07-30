@@ -65,6 +65,12 @@ typedef struct {
 	long pos;
 } PhraseData;
 
+/* WordData is a special case of length-one phrase. */
+typedef struct {
+	PhraseData str_data;
+	int index; /* Used for stable sort */
+} WordData;
+
 /*
  * Please see TreeType for data field. pFirstChild points to the first of its
  * child list. pNextSibling points to its right sibling, where it and its right
@@ -77,8 +83,11 @@ typedef struct _tNODE {
 	struct _tNODE *pFirstChild, *pNextSibling;
 } NODE;
 
-PhraseData word_data[MAX_WORD_DATA], phrase_data[MAX_PHRASE_DATA];
-int num_word_data = 0, num_phrase_data = 0;
+WordData word_data[MAX_WORD_DATA];
+int num_word_data = 0;
+
+PhraseData phrase_data[MAX_PHRASE_DATA];
+int num_phrase_data = 0;
 
 NODE *root;
 
@@ -105,16 +114,16 @@ void strip(char *line)
 
 int compare_word(const void *x, const void *y)
 {
-	const PhraseData *a = (const PhraseData *)x;
-	const PhraseData *b = (const PhraseData *)y;
+	const WordData *a = (const WordData *)x;
+	const WordData *b = (const WordData *)y;
 	int ret;
 
-	ret = strcmp(a->phrase, b->phrase);
+	ret = strcmp(a->str_data.phrase, b->str_data.phrase);
 	if (ret != 0)
 		return ret;
 
-	if (a->phone[0] != b->phone[0])
-		return a->phone[0] - b->phone[0];
+	if (a->str_data.phone[0] != b->str_data.phone[0])
+		return a->str_data.phone[0] - b->str_data.phone[0];
 
 	return 0;
 }
@@ -189,10 +198,10 @@ void store_phrase(const char *line, int line_num)
 		++num_phrase_data;
 	}
 	else {
-		PhraseData *pWord;
-		pWord=(PhraseData*)bsearch(&tmp_phr, word_data, num_word_data, sizeof(PhraseData), compare_word);
+		WordData *pWord;
+		pWord = (WordData*)bsearch(&tmp_phr, word_data, num_word_data, sizeof(WordData), compare_word);
 		if( pWord ){
-			pWord->freq = tmp_phr.freq;
+			pWord->str_data.freq = tmp_phr.freq;
 		}
 		else fprintf(stderr, "Warning: '%s' in phrase source is not in word source.\n", tmp_phr.phrase);
 	}
@@ -260,14 +269,14 @@ void store_word(const char *line, const int line_num)
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].phrase);
+		key_buf, word_data[num_word_data].str_data.phrase);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].phone[0] = UintFromPhone(phone_buf);
+	word_data[num_word_data].str_data.phone[0] = UintFromPhone(phone_buf);
 
 	/* FIXME
 	 * Here, check if the word with this phone exists in phrase dictionary.
