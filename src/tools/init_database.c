@@ -112,6 +112,19 @@ void strip(char *line)
 	}
 }
 
+/* Comparison by phone and index reversely. */
+int compare_word_by_phone(const void *x, const void *y)
+{
+	const WordData *a = (const WordData *)x;
+	const WordData *b = (const WordData *)y;
+
+	if (a->str_data.phone[0] != b->str_data.phone[0])
+		return b->str_data.phone[0] - a->str_data.phone[0];
+
+	/* Compare original index for stable sort */
+	return b->index - a->index;
+}
+
 int compare_word(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
@@ -400,6 +413,10 @@ void construct_phrase_tree()
 
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
+
+	/* word_data is sorted reversely for computation convenience. */
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
+
 	for(i = 0; i < num_phrase_data; ++i)
 	{
 		levelPtr=root;
