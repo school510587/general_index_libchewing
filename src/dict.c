@@ -15,10 +15,6 @@
   #include <config.h>
 #endif
 
-#if ! defined(USE_BINARY_DATA)
-#include <stdlib.h>
-#endif
-
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -27,29 +23,6 @@
 #include "plat_mmap.h"
 #include "dict-private.h"
 #include "memory-private.h"
-
-#if ! defined(USE_BINARY_DATA)
-#include "private.h"
-#endif
-
-#if ! defined(USE_BINARY_DATA)
-static char *fgettab( char *buf, int maxlen, FILE *fp )
-{
-	int i;
-
-	for ( i = 0; i < maxlen; i++ ) {
-		buf[ i ] = (char) fgetc( fp );
-		if ( feof( fp ) )
-			break;
-		if ( buf[ i ] == '\t' )
-			break;
-	}
-	if ( feof( fp ) )
-		return 0;
-	buf[ i ] = '\0';
-	return buf;
-}
-#endif
 
 void TerminateDict( ChewingData *pgdata )
 {
