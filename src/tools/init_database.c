@@ -20,9 +20,9 @@
  *	The output file contains a random access array, where each record includes:\n
  *	\code{
  *	       uint32_t key; may be phone data or record of input keys
- *	       int child.begin, child.end; for internal nodes (key != 0)
- *	       long phrase.pos; for leaf nodes (key == 0), position of phrase in dictionary
- *	       int phrase.freq; for leaf nodes (key == 0), frequency of the phrase
+ *	       int32_t child.begin, child.end; for internal nodes (key != 0)
+ *	       uint32_t phrase.pos; for leaf nodes (key == 0), position of phrase in dictionary
+ *	       int32_t phrase.freq; for leaf nodes (key == 0), frequency of the phrase
  *	}\endcode
  */
 
@@ -395,7 +395,7 @@ void insert_leaf(NODE *parent, long phr_pos, int freq, int word_index)
 		if(p->index >= word_index) break;
 	}
 	pnew = new_node(0);
-	pnew->data.phrase.pos = phr_pos;
+	pnew->data.phrase.pos = (uint32_t)phr_pos;
 	pnew->data.phrase.freq = freq;
 	pnew->index = word_index;
 	if(prev == NULL)
