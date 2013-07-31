@@ -60,7 +60,7 @@ const char USAGE[] =
 typedef struct {
 	uint16_t phone;
 	char word[MAX_UTF8_SIZE + 1];
-	int index;
+	int index; /* For stable sorting. */
 } WordData;
 
 /* An additional pos helps avoid duplicate Chinese strings. */
