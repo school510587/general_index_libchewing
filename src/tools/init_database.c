@@ -60,6 +60,7 @@ const char USAGE[] =
 typedef struct {
 	uint16_t phone;
 	char word[MAX_UTF8_SIZE + 1];
+	int index;
 } WordData;
 
 /* An additional pos helps avoid duplicate Chinese strings. */
@@ -109,6 +110,18 @@ void strip(char *line)
 		*end = 0;
 		--end;
 	}
+}
+
+int compare_word_by_phone(const void *x, const void *y)
+{
+	const WordData *a = (const WordData *)x;
+	const WordData *b = (const WordData *)y;
+
+	if (a->phone != b->phone)
+		return a->phone - b->phone;
+
+	/* Compare original index for stable sort */
+	return a->index - b->index;
 }
 
 int compare_word(const void *x, const void *y)
@@ -268,11 +281,7 @@ void store_word(const char *line, const int line_num)
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
 	word_data[num_word_data].phone = UintFromPhone(phone_buf);
 
-	/* FIXME
-	 * Here, check if the word with this phone exists in phrase dictionary.
-	 * If it is guaranteed that each word exists in phrase dictionary with
-	 * phones listed in phone.cin, the step can be ignored.
-	 */
+	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
 }
 
@@ -330,6 +339,8 @@ void read_phone_cin(const char *filename)
 			store_word(buf, line_num);
 	}
 	fclose(phone_cin);
+
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
 }
 
 NODE *new_node( uint32_t key )
