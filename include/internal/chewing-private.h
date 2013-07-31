@@ -77,11 +77,11 @@ typedef struct {
 	uint32_t key;
 	union{
 		struct{
-			int begin, end;
+			int32_t begin, end;
 		} child;
 		struct {
-			long pos;
-			int freq;
+			uint32_t pos;
+			int32_t freq;
 		} phrase;
 	};
 } TreeType;
