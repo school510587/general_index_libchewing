@@ -429,7 +429,6 @@ void write_phrase_data()
 {
 	FILE *dict_file;
 	int i;
-	int pos;
 
 	dict_file = fopen(DICT_FILE, "wb");
 
