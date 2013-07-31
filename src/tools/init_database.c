@@ -149,10 +149,6 @@ void store_phrase(const char *line, int line_num)
 	char *freq;
 	char *bopomofo;
 	size_t phrase_len;
-	size_t i;
-	size_t j;
-	WordData word;
-	char bopomofo_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 
 	strncpy(buf, line, sizeof(buf));
 
@@ -216,7 +212,7 @@ int compare_phrase(const void *x, const void *y)
 	const PhraseData *a = (const PhraseData *) x, *b = (const PhraseData *) y;
 	int cmp=strcmp(a->phrase, b->phrase);
 
-	/* If phrases are different, it returns the result of strcmp(); else it 
+	/* If phrases are different, it returns the result of strcmp(); else it
 	 * reports an error when the same phone sequence is found.
 	 */
 	if (cmp) return cmp;
@@ -256,7 +252,6 @@ void store_word(const char *line, const int line_num)
 	char phone_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 	char key_buf[ZUIN_SIZE + 1];
 	char buf[MAX_LINE_LEN];
-	int i, j;
 
 	strncpy(buf, line, sizeof(buf));
 
@@ -333,6 +328,9 @@ void read_phone_cin(const char *filename)
 							exit(-1);
 						}
 					break;
+					case HAS_CHARDEF_END:
+						assert(!"NOTREACHED");
+					break;
 				}
 			}
 		}
@@ -407,7 +405,7 @@ void insert_leaf(NODE *parent, long phr_pos, int freq, int word_index)
 
 void construct_phrase_tree()
 {
-	NODE *levelPtr, *child;
+	NODE *levelPtr;
 	int i, j, k;
 
 	/* Key value of root will become tree_size later. */
@@ -429,7 +427,6 @@ void write_phrase_data()
 {
 	FILE *dict_file;
 	int i;
-	int pos;
 
 	dict_file = fopen(DICT_FILE, "wb");
 
