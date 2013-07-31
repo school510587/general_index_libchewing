@@ -81,6 +81,7 @@ typedef struct {
 typedef struct _tNODE {
 	TreeType data;
 	struct _tNODE *pFirstChild, *pNextSibling;
+	int index;
 } NODE;
 
 WordData word_data[MAX_WORD_DATA];
@@ -356,6 +357,7 @@ NODE *new_node( uint32_t key )
 	pnew->data.key = key;
 	pnew->pFirstChild = NULL;
 	pnew->pNextSibling=NULL;
+	pnew->index=-1;
 	return pnew;
 }
 
@@ -380,15 +382,22 @@ NODE *find_or_insert(NODE *parent, uint32_t key)
 	return pnew;
 }
 
-void insert_leaf(NODE *parent, long phr_pos, int freq)
+void insert_leaf(NODE *parent, long phr_pos, int freq, int word_index)
 {
 	NODE *prev=NULL, *p, *pnew;
 
-	for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
+	if(word_index < 0) {
+		for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
 		if(p->data.phrase.freq <= freq) break;
+	}
+	else {
+	for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
+		if(p->index >= word_index) break;
+	}
 	pnew = new_node(0);
 	pnew->data.phrase.pos = phr_pos;
 	pnew->data.phrase.freq = freq;
+	pnew->index = word_index;
 	if(prev == NULL)
 		parent->pFirstChild = pnew;
 	else
@@ -399,7 +408,7 @@ void insert_leaf(NODE *parent, long phr_pos, int freq)
 void construct_phrase_tree()
 {
 	NODE *levelPtr, *child;
-	int i, j;
+	int i, j, k;
 
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
@@ -408,7 +417,11 @@ void construct_phrase_tree()
 		levelPtr=root;
 		for(j=0; phrase_data[i].phone[j]!=0; ++j)
 			levelPtr=find_or_insert(levelPtr, phrase_data[i].phone[j]);
-		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq);
+		k=-1;
+		if( phrase_data[i].phone[1] == 0) {
+			for(k=0; k<num_word_data && (phrase_data[i].phone[0] != word_data[k].phone || strcmp(phrase_data[i].phrase, word_data[k].word) ); k++) ;
+		}
+		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq, k);
 	}
 }
 
