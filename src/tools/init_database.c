@@ -57,6 +57,11 @@ const char USAGE[] =
 	"* " DICT_FILE "\n\tmain phrase file\n"
 ;
 
+typedef struct {
+	uint16_t phone;
+	char word[MAX_UTF8_SIZE + 1];
+} WordData;
+
 /* An additional pos helps avoid duplicate Chinese strings. */
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
@@ -64,12 +69,6 @@ typedef struct {
 	uint16_t phone[MAX_PHRASE_LEN + 1];
 	long pos;
 } PhraseData;
-
-/* WordData is a special case of length-one phrase. */
-typedef struct {
-	PhraseData str_data;
-	int index; /* Used for stable sort */
-} WordData;
 
 /*
  * Please see TreeType for data field. pFirstChild points to the first of its
@@ -112,38 +111,24 @@ void strip(char *line)
 	}
 }
 
-/* Comparison by phone and index reversely. */
-int compare_word_by_phone(const void *x, const void *y)
-{
-	const WordData *a = (const WordData *)x;
-	const WordData *b = (const WordData *)y;
-
-	if (a->str_data.phone[0] != b->str_data.phone[0])
-		return b->str_data.phone[0] - a->str_data.phone[0];
-
-	/* Compare original index for stable sort */
-	return b->index - a->index;
-}
-
 int compare_word(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
 	int ret;
 
-	ret = strcmp(a->str_data.phrase, b->str_data.phrase);
+	ret = strcmp(a->word, b->word);
 	if (ret != 0)
 		return ret;
 
-	if (a->str_data.phone[0] != b->str_data.phone[0])
-		return a->str_data.phone[0] - b->str_data.phone[0];
+	if (a->phone != b->phone)
+		return a->phone - b->phone;
 
 	return 0;
 }
 
 void store_phrase(const char *line, int line_num)
 {
-	PhraseData tmp_phr;                                                     
 	const char DELIM[] = " \t\n";
 	char buf[MAX_LINE_LEN];
 	char *phrase;
@@ -152,6 +137,8 @@ void store_phrase(const char *line, int line_num)
 	size_t phrase_len;
 	size_t i;
 	size_t j;
+	WordData word;
+	char bopomofo_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 
 	strncpy(buf, line, sizeof(buf));
 
@@ -159,13 +146,18 @@ void store_phrase(const char *line, int line_num)
 	if (strlen(buf) == 0)
 		return;
 
+	if (num_phrase_data >= MAX_PHRASE_DATA) {
+		fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
+		exit(-1);
+	}
+
 	/* read phrase */
 	phrase = strtok(buf, DELIM);
 	if (!phrase) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
-	strncpy(tmp_phr.phrase, phrase, sizeof(tmp_phr.phrase));
+	strncpy(phrase_data[num_phrase_data].phrase, phrase, sizeof(phrase_data[0].phrase));
 
 	/* read frequency */
 	freq = strtok(NULL, DELIM);
@@ -175,7 +167,7 @@ void store_phrase(const char *line, int line_num)
 	}
 
 	errno = 0;
-	tmp_phr.freq = strtol(freq, 0, 0);
+	phrase_data[num_phrase_data].freq = strtol(freq, 0, 0);
 	if (errno) {
 		fprintf(stderr, "Error reading frequency `%s' in line %d, `%s'\n", freq, line_num, line);
 		exit(-1);
@@ -186,8 +178,8 @@ void store_phrase(const char *line, int line_num)
 		bopomofo && phrase_len < MAX_PHRASE_LEN;
 		bopomofo = strtok(NULL, DELIM), ++phrase_len) {
 
-		tmp_phr.phone[phrase_len] = UintFromPhone(bopomofo);
-		if (tmp_phr.phone[phrase_len] == 0) {
+		phrase_data[num_phrase_data].phone[phrase_len] = UintFromPhone(bopomofo);
+		if (phrase_data[num_phrase_data].phone[phrase_len] == 0) {
 			fprintf(stderr, "Error reading bopomofo `%s' in line %d, `%s'\n", bopomofo, line_num, line);
 			exit(-1);
 		}
@@ -197,27 +189,12 @@ void store_phrase(const char *line, int line_num)
 	}
 
 	/* check phrase length & bopomofo length */
-	if ((size_t)ueStrLen(tmp_phr.phrase) != phrase_len) {
+	if ((size_t)ueStrLen(phrase_data[num_phrase_data].phrase) != phrase_len) {
 		fprintf(stderr, "Phrase length and bopomofo length mismatch in line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 
-	if(phrase_len > 1) {
-		if (num_phrase_data >= MAX_PHRASE_DATA) {
-			fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
-			exit(-1);
-		}
-		memcpy(&phrase_data[num_phrase_data], &tmp_phr, sizeof(tmp_phr));
-		++num_phrase_data;
-	}
-	else {
-		WordData *pWord;
-		pWord = (WordData*)bsearch(&tmp_phr, word_data, num_word_data, sizeof(WordData), compare_word);
-		if( pWord ){
-			pWord->str_data.freq = tmp_phr.freq;
-		}
-		else fprintf(stderr, "Warning: '%s' in phrase source is not in word source.\n", tmp_phr.phrase);
-	}
+	++num_phrase_data;
 }
 
 int compare_phrase(const void *x, const void *y)
@@ -282,16 +259,20 @@ void store_word(const char *line, const int line_num)
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].str_data.phrase);
+		key_buf, word_data[num_word_data].word);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].str_data.phone[0] = UintFromPhone(phone_buf);
+	word_data[num_word_data].phone = UintFromPhone(phone_buf);
 
-	word_data[num_word_data].index = num_word_data;
+	/* FIXME
+	 * Here, check if the word with this phone exists in phrase dictionary.
+	 * If it is guaranteed that each word exists in phrase dictionary with
+	 * phones listed in phone.cin, the step can be ignored.
+	 */
 	++num_word_data;
 }
 
@@ -349,8 +330,6 @@ void read_phone_cin(const char *filename)
 			store_word(buf, line_num);
 	}
 	fclose(phone_cin);
-
-	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word);
 }
 
 NODE *new_node( uint32_t key )
@@ -413,10 +392,6 @@ void construct_phrase_tree()
 
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
-
-	/* word_data is sorted reversely for computation convenience. */
-	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
-
 	for(i = 0; i < num_phrase_data; ++i)
 	{
 		levelPtr=root;
@@ -429,8 +404,7 @@ void construct_phrase_tree()
 void write_phrase_data()
 {
 	FILE *dict_file;
-	PhraseData *pWritten, *pLast = NULL;
-	int w, p;
+	int i;
 	int pos;
 
 	dict_file = fopen(DICT_FILE, "wb");
@@ -445,18 +419,13 @@ void write_phrase_data()
 	 * dictionary. Written phrases are separated by '\0', for convenience of
 	 * mmap usage.
 	 */
-	for (w = p = 0; w < num_word_data || p < num_phrase_data; pLast = pWritten)
+	for (i = 0; i < num_phrase_data; ++i)
 	{
-		if(p >= num_phrase_data) pWritten = &word_data[w++].str_data;                              
-		else if(w >= num_word_data) pWritten = &phrase_data[p++];
-		else if( strcmp(word_data[w].str_data.phrase, phrase_data[p].phrase)<0 ) pWritten = &word_data[w++].str_data;
-		else pWritten = &phrase_data[p++];
-
-		if(pLast && !strcmp(pWritten->phrase, pLast->phrase))
-			pWritten->pos = pLast->pos;
+		if(i>0 && !strcmp(phrase_data[i].phrase, phrase_data[i-1].phrase))
+			phrase_data[i].pos = phrase_data[i-1].pos;
 		else {
-			pWritten->pos=ftell(dict_file);
-			fwrite(pWritten->phrase, (strlen(pWritten->phrase)+1), 1, dict_file);
+			phrase_data[i].pos=ftell(dict_file);
+			fwrite(phrase_data[i].phrase, (strlen(phrase_data[i].phrase)+1), 1, dict_file);
 		}
 	}
 
