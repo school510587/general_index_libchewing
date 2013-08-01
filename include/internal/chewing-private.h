@@ -21,10 +21,6 @@
 #  include <stdint.h>
 #endif
 
-#ifndef USE_BINARY_DATA
-#include <stdio.h>
-#endif
-
 #include "global.h"
 #include "plat_mmap.h"
 

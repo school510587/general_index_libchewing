@@ -44,12 +44,6 @@ endif()
 # automake compatibility
 add_definitions(-DHAVE_CONFIG_H=1)
 
-# binary data representation
-option(USE_BINARY_DATA "Use binary representation for internal data manipulation" true)
-if (USE_BINARY_DATA)
-	add_definitions(-DUSE_BINARY_DATA=1)
-endif()
-
 # Use valgrind when testing
 option(USE_VALGRIND "Use valgrind when testing" true)
 
@@ -161,9 +155,8 @@ foreach(target ${ALL_STATIC_TEST})
 endforeach()
 
 # tools
-set(ALL_TOOLS sort maketree)
-add_executable(sort ${TOOLS_SRC_DIR}/sort.c $<TARGET_OBJECTS:common>)
-add_executable(maketree ${TOOLS_SRC_DIR}/maketree.c)
+set(ALL_TOOLS init_database)
+add_executable(init_database ${TOOLS_SRC_DIR}/init_database.c $<TARGET_OBJECTS:common>)
 set_target_properties(${ALL_TOOLS} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${TOOLS_BIN_DIR}
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TOOLS_BIN_DIR}
@@ -176,12 +169,8 @@ set_target_properties(${ALL_TOOLS} PROPERTIES
 add_custom_command(
 	OUTPUT
 		${ALL_DATA}
-		${PROJECT_BINARY_DIR}/chewing-definition.h
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${DATA_BIN_DIR}
-	COMMAND ${CMAKE_COMMAND} -E chdir ${DATA_BIN_DIR} ${TOOLS_BIN_DIR}/sort ${DATA_SRC_DIR}/phone.cin ${DATA_SRC_DIR}/tsi.src
-	COMMAND ${CMAKE_COMMAND} -E chdir ${DATA_BIN_DIR} ${TOOLS_BIN_DIR}/maketree ${DATA_BIN_DIR}/phoneid.dic
-	COMMAND ${CMAKE_COMMAND} -E copy ${DATA_BIN_DIR}/chewing-definition.h ${PROJECT_BINARY_DIR}/chewing-definition.h
-	COMMAND ${CMAKE_COMMAND} -E remove -f ${DATA_BIN_DIR}/chewing-definition.h ${DATA_BIN_DIR}/phoneid.dic
+	COMMAND ${CMAKE_COMMAND} -E chdir ${DATA_BIN_DIR} ${TOOLS_BIN_DIR}/init_database ${DATA_SRC_DIR}/phone.cin ${DATA_SRC_DIR}/tsi.src
 	DEPENDS
 		${ALL_TOOLS}
 		${DATA_SRC_DIR}/phone.cin
@@ -297,8 +286,6 @@ add_library(chewing OBJECT
 	${SRC_DIR}/userphrase.c
 	${SRC_DIR}/zuin.c
 )
-add_custom_target(chewing-definition DEPENDS ${PROJECT_BINARY_DIR}/chewing-definition.h)
-add_dependencies(chewing chewing-definition)
 set_target_properties(chewing PROPERTIES
 	COMPILE_DEFINITIONS "LIBDIR=\"${INSTALL_DATA}\""
 )

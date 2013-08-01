@@ -16,9 +16,6 @@
  * @file char.c
  * @brief word data file
  */
-#if ! defined(USE_BINARY_DATA)
-#include <assert.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,25 +24,6 @@
 #include "char-private.h"
 #include "private.h"
 #include "plat_mmap.h"
-
-#if ! defined(USE_BINARY_DATA)
-static char *fgettab( char *buf, int maxlen, FILE *fp )
-{
-	int i;
-
-	for ( i = 0; i < maxlen; i++ ) {
-		buf[ i ] = (char) fgetc( fp );
-		if ( feof( fp ) )
-			break;
-		if ( buf[ i ] == '\t' )
-			break;
-	}
-	if ( feof( fp ) )
-		return 0;
-	buf[ i ] = '\0';
-	return buf;
-}
-#endif
 
 static int CompTreeType( const void *pa, const void *pb )
 {
