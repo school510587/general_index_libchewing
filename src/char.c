@@ -45,9 +45,9 @@ int InitChar( ChewingData *pgdata , const char * prefix )
  */
 static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
 {
-	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.char_cur_pos ];
+	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ];
 	strcpy(wrd_ptr->word, pgdata->static_data.dict + pLeaf->phrase.pos);
-	pgdata->static_data.char_cur_pos++;
+	pgdata->static_data.tree_cur_pos++;
 }
 
 int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
@@ -63,16 +63,16 @@ int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
 	if ( ! pinx )
 		return 0;
 
-	pgdata->static_data.char_cur_pos = pinx->child.begin;
-	pgdata->static_data.char_end_pos = pinx->child.end;
+	pgdata->static_data.tree_cur_pos = pinx->child.begin;
+	pgdata->static_data.tree_end_pos = pinx->child.end;
 	Str2Word( pgdata, wrd_ptr );
 	return 1;
 }
 
 int GetCharNext( ChewingData *pgdata, Word *wrd_ptr )
 {
-	if ( pgdata->static_data.char_cur_pos >= pgdata->static_data.char_end_pos
-		|| pgdata->static_data.tree[ pgdata->static_data.char_cur_pos ].key != 0)
+	if ( pgdata->static_data.tree_cur_pos >= pgdata->static_data.tree_end_pos
+		|| pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ].key != 0)
 		return 0;
 	Str2Word( pgdata, wrd_ptr );
 	return 1;
