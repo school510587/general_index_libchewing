@@ -14,10 +14,6 @@
 #include "global.h"
 #include "chewing-private.h"
 
-#ifndef SEEK_SET
-#define SEEK_SET 0
-#endif
-
 typedef struct {
 	char word[ MAX_UTF8_SIZE+1 ];
 } Word;
