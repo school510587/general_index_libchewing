@@ -23,7 +23,6 @@
 #include "chewing-utf8-util.h"
 #include "global.h"
 #include "dict-private.h"
-#include "char-private.h"
 #include "chewingutil.h"
 #include "tree-private.h"
 #include "userphrase-private.h"

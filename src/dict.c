@@ -55,6 +55,11 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 	return 0;
 }
 
+static int CompTreeType( const void *a, const void *b )
+{
+	return ( ((TreeType*)a)->key - ((TreeType*)b)->key );
+}
+
 /*
  * The function gets string of phrase from dictionary and its frequency from
  * tree index mmap, and stores them into buffer given by phr_ptr.
@@ -65,6 +70,23 @@ static void GetPhraseFromDict( ChewingData *pgdata, Phrase *phr_ptr )
 	strcpy(phr_ptr->phrase, pgdata->static_data.dict + pLeaf->phrase.pos);
 	phr_ptr->freq = pLeaf->phrase.freq;
 	pgdata->static_data.tree_cur_pos++;
+}
+
+int GetCharFirst( ChewingData *pgdata, Phrase *wrd_ptr, uint16_t key )
+{
+	const TreeType *pinx;
+	TreeType keyNode = {0};
+	keyNode.key = key;
+	pinx = (const TreeType*) bsearch(
+		&keyNode, pgdata->static_data.tree + pgdata->static_data.tree[0].child.begin,
+		pgdata->static_data.tree[0].child.end - pgdata->static_data.tree[0].child.begin,
+	sizeof( TreeType ), CompTreeType );
+	if ( ! pinx )
+		return 0;
+	pgdata->static_data.tree_cur_pos = pinx->child.begin;
+	pgdata->static_data.tree_end_pos = pinx->child.end;
+	GetPhraseFromDict( pgdata, wrd_ptr );
+	return 1;
 }
 
 /*
