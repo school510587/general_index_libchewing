@@ -94,7 +94,7 @@ static int EndKeyProcess( ChewingData *pgdata, int key, int searchTimes )
 {
 	ZuinData *pZuin = &(pgdata->zuinData);
 	uint16_t u16Pho, u16PhoAlt;
-	Word tempword;
+	Phrase tempword;
 	int pho_inx;
 
 	if (

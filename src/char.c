@@ -43,14 +43,14 @@ int InitChar( ChewingData *pgdata , const char * prefix )
  * The function gets string of a Chinese character from dictionary, and stores
  * it into buffer given by wrd_ptr.
  */
-static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
+static void Str2Word( ChewingData *pgdata, Phrase *wrd_ptr )
 {
 	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ];
-	strcpy(wrd_ptr->word, pgdata->static_data.dict + pLeaf->phrase.pos);
+	strcpy(wrd_ptr->phrase, pgdata->static_data.dict + pLeaf->phrase.pos);
 	pgdata->static_data.tree_cur_pos++;
 }
 
-int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
+int GetCharFirst( ChewingData *pgdata, Phrase *wrd_ptr, uint16_t key )
 {
 	const TreeType *pinx;
 	TreeType keyNode = {0};
@@ -69,7 +69,7 @@ int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t key )
 	return 1;
 }
 
-int GetCharNext( ChewingData *pgdata, Word *wrd_ptr )
+int GetCharNext( ChewingData *pgdata, Phrase *wrd_ptr )
 {
 	if ( pgdata->static_data.tree_cur_pos >= pgdata->static_data.tree_end_pos
 		|| pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ].key != 0)
