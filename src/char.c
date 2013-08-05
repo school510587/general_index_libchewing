@@ -68,12 +68,3 @@ int GetCharFirst( ChewingData *pgdata, Phrase *wrd_ptr, uint16_t key )
 	Str2Word( pgdata, wrd_ptr );
 	return 1;
 }
-
-int GetCharNext( ChewingData *pgdata, Phrase *wrd_ptr )
-{
-	if ( pgdata->static_data.tree_cur_pos >= pgdata->static_data.tree_end_pos
-		|| pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ].key != 0)
-		return 0;
-	Str2Word( pgdata, wrd_ptr );
-	return 1;
-}

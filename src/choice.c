@@ -173,7 +173,7 @@ static void ChoiceInfoAppendChi( ChewingData *pgdata,  ChoiceInfo *pci, uint16_t
 			pci->totalChoiceStr[ pci->nTotalChoice ]
 					   [ len ] = '\0';
 			pci->nTotalChoice++;
-		} while ( GetCharNext( pgdata, &tempWord ) );
+		} while ( GetPhraseNext( pgdata, &tempWord ) );
 	}
 }
 

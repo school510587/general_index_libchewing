@@ -15,7 +15,6 @@
 #include "chewing-private.h"
 
 int GetCharFirst( ChewingData *, Phrase *, uint16_t );
-int GetCharNext ( ChewingData *, Phrase * );
 int InitChar( ChewingData *pgdata, const char * prefix );
 void TerminateChar( ChewingData *pgdata );
 
