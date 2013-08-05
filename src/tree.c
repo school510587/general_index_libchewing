@@ -232,7 +232,7 @@ static int CheckChoose(
 			*pp_phr = phrase;
 			return 1;
 		}
-	} while ( GetPhraseNext( pgdata, phrase ) );
+	} while ( GetVocabNext( pgdata, phrase ) );
 	free( phrase );
 	return 0;
 }

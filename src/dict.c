@@ -104,7 +104,7 @@ int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phrase_parent_id )
 	return 1;
 }
 
-int GetPhraseNext( ChewingData *pgdata, Phrase *phr_ptr )
+int GetVocabNext( ChewingData *pgdata, Phrase *phr_ptr )
 {
 	if ( pgdata->static_data.tree_cur_pos >= pgdata->static_data.tree_end_pos
 		|| pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ].key != 0)
