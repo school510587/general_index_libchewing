@@ -14,12 +14,8 @@
 #include "global.h"
 #include "chewing-private.h"
 
-typedef struct {
-	char word[ MAX_UTF8_SIZE+1 ];
-} Word;
-
-int GetCharFirst( ChewingData *, Word *, uint16_t );
-int GetCharNext ( ChewingData *, Word * );
+int GetCharFirst( ChewingData *, Phrase *, uint16_t );
+int GetCharNext ( ChewingData *, Phrase * );
 int InitChar( ChewingData *pgdata, const char * prefix );
 void TerminateChar( ChewingData *pgdata );
 

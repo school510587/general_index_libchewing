@@ -540,12 +540,12 @@ static void Discard2( TreeDataType *ptd )
 static void LoadChar( ChewingData *pgdata, char *buf, int buf_len, const uint16_t phoneSeq[], int nPhoneSeq )
 {
 	int i;
-	Word word;
+	Phrase word;
 
 	memset(buf, 0, buf_len);
 	for ( i = 0; i < nPhoneSeq; i++ ) {
 		GetCharFirst( pgdata, &word, phoneSeq[ i ] );
-		strncat(buf, word.word, buf_len - strlen(buf) - 1);
+		strncat(buf, word.phrase, buf_len - strlen(buf) - 1);
 	}
 	buf[ buf_len - 1 ] = '\0';
 }
