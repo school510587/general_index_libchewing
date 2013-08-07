@@ -124,7 +124,7 @@ int compare_word_by_phone(const void *x, const void *y)
 	return a->index - b->index;
 }
 
-int compare_word(const void *x, const void *y)
+int compare_word_by_text(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
@@ -338,7 +338,7 @@ void read_phone_cin(const char *filename)
 	}
 	fclose(phone_cin);
 
-	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_text);
 }
 
 NODE *new_node( uint32_t key )
@@ -406,6 +406,9 @@ void construct_phrase_tree()
 {
 	NODE *levelPtr;
 	int i, j, k;
+
+	/* First, assume that words are in order of their phones and indices. */
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
 
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
