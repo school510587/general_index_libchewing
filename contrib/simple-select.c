@@ -21,6 +21,7 @@ int main()
 	 * Parameter 2：path to keep user-defined phrases
 	 */
 	chewing_Init("../data/", ".");
+
 	ct = chewing_new();
 
 	/* Chinese mode by default */
