@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "zuin-private.h"
+#include "dict-private.h"
 #include "key2pho-private.h"
 #include "pinyin-private.h"
 #include "private.h"
