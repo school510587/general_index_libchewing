@@ -57,12 +57,6 @@ const char USAGE[] =
 	"* " DICT_FILE "\n\tmain phrase file\n"
 ;
 
-typedef struct {
-	uint16_t phone;
-	char word[MAX_UTF8_SIZE + 1];
-	int index; /* For stable sorting. */
-} WordData;
-
 /* An additional pos helps avoid duplicate Chinese strings. */
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
@@ -70,6 +64,11 @@ typedef struct {
 	uint16_t phone[MAX_PHRASE_LEN + 1];
 	long pos;
 } PhraseData;
+
+typedef struct {
+	PhraseData text; // Common part shared with PhraseData. */
+	int index; /* For stable sorting. */
+} WordData;
 
 /*
  * Please see TreeType for data field. pFirstChild points to the first of its
@@ -118,8 +117,8 @@ int compare_word_by_phone(const void *x, const void *y)
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
 
-	if (a->phone != b->phone)
-		return a->phone - b->phone;
+	if (a->text.phone[0] != b->text.phone[0])
+		return a->text.phone[0] - b->text.phone[0];
 
 	/* Compare original index for stable sort */
 	return a->index - b->index;
@@ -131,12 +130,12 @@ int compare_word(const void *x, const void *y)
 	const WordData *b = (const WordData *)y;
 	int ret;
 
-	ret = strcmp(a->word, b->word);
+	ret = strcmp(a->text.phrase, b->text.phrase);
 	if (ret != 0)
 		return ret;
 
-	if (a->phone != b->phone)
-		return a->phone - b->phone;
+	if (a->text.phone[0] != b->text.phone[0])
+		return a->text.phone[0] - b->text.phone[0];
 
 	return 0;
 }
@@ -268,14 +267,14 @@ void store_word(const char *line, const int line_num)
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].word);
+		key_buf, word_data[num_word_data].text.phrase);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].phone = UintFromPhone(phone_buf);
+	word_data[num_word_data].text.phone[0] = UintFromPhone(phone_buf);
 
 	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
@@ -417,7 +416,7 @@ void construct_phrase_tree()
 			levelPtr=find_or_insert(levelPtr, phrase_data[i].phone[j]);
 		k=-1;
 		if( phrase_data[i].phone[1] == 0) {
-			for(k=0; k<num_word_data && (phrase_data[i].phone[0] != word_data[k].phone || strcmp(phrase_data[i].phrase, word_data[k].word) ); k++) ;
+			for(k=0; k<num_word_data && (phrase_data[i].phone[0] != word_data[k].text.phone[0] || strcmp(phrase_data[i].phrase, word_data[k].text.phrase) ); k++) ;
 		}
 		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq, k);
 	}
