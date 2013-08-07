@@ -443,7 +443,8 @@ void construct_phrase_tree()
 void write_phrase_data()
 {
 	FILE *dict_file;
-	int i;
+	PhraseData *cur_phr, *last_phr;
+	int i, j;
 
 	dict_file = fopen(DICT_FILE, "wb");
 
@@ -457,13 +458,16 @@ void write_phrase_data()
 	 * dictionary. Written phrases are separated by '\0', for convenience of
 	 * mmap usage.
 	 */
-	for (i = 0; i < num_phrase_data; ++i)
-	{
-		if(i>0 && !strcmp(phrase_data[i].phrase, phrase_data[i-1].phrase))
-			phrase_data[i].pos = phrase_data[i-1].pos;
+	for(i = j = 0; i < num_word_data || j < num_phrase_data; last_phr = cur_phr){
+		if(i == num_word_data) cur_phr = &phrase_data[j++];
+		else if(j == num_phrase_data) cur_phr = &word_data[i++].text;
+		else cur_phr = strcmp(word_data[i].text.phrase, phrase_data[j].phrase)<0 ? &word_data[i++].text : &phrase_data[j++];
+
+		if(last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
+			cur_phr->pos = last_phr->pos;
 		else {
-			phrase_data[i].pos=ftell(dict_file);
-			fwrite(phrase_data[i].phrase, (strlen(phrase_data[i].phrase)+1), 1, dict_file);
+			cur_phr->pos = ftell(dict_file);
+			fwrite(cur_phr->phrase, strlen(cur_phr->phrase)+1, 1, dict_file);
 		}
 	}
 
