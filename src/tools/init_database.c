@@ -146,11 +146,12 @@ void store_phrase(const char *line, int line_num)
 	char buf[MAX_LINE_LEN];
 	char *phrase;
 	char *freq;
-	char *bopomofo;
+	char *bopomofo, bopomofo_buf[MAX_UTF8_SIZE*ZUIN_SIZE+1];
 	size_t phrase_len;
+	WordData word; /* For check. */
+	int i;
 
 	strncpy(buf, line, sizeof(buf));
-
 	strip(buf);
 	if (strlen(buf) == 0)
 		return;
@@ -202,6 +203,20 @@ void store_phrase(const char *line, int line_num)
 		fprintf(stderr, "Phrase length and bopomofo length mismatch in line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
+
+	/* Please delete this #if after resoving exception phrase cases. It causes some unused variables. */
+#if 0
+	/* Check that each word in phrase can be found in word list. */
+	for (i = 0; i < phrase_len; ++i) {
+		ueStrNCpy(word.text.phrase, ueStrSeek(phrase_data[num_phrase_data].phrase, i), 1, 1);
+		word.text.phone[0] = phrase_data[num_phrase_data].phone[i];
+		if (bsearch(&word, word_data, num_word_data, sizeof(word), compare_word_by_text) == NULL) {
+			PhoneFromUint(bopomofo_buf, sizeof(bopomofo_buf), word.text.phone[0]);
+			fprintf(stderr, "Phrase:%d:error:`%s': `%s' has no phone `%s'\n", line_num, phrase_data[num_phrase_data].phrase, word.text.phrase, bopomofo_buf);
+			exit(-1);
+		}
+	}
+#endif
 
 	++num_phrase_data;
 }
