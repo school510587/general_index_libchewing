@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "global-private.h"
 #include "plat_mmap.h"
