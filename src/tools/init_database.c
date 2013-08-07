@@ -218,7 +218,7 @@ void store_phrase(const char *line, int line_num)
 	}
 #endif
 
-	++num_phrase_data;
+	if(phrase_len >= 2) ++num_phrase_data;
 }
 
 int compare_phrase(const void *x, const void *y)
