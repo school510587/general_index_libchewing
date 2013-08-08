@@ -435,6 +435,7 @@ void construct_phrase_tree()
 		root->pFirstChild->pFirstChild = levelPtr;
 	}
 
+	/* Third, insert phrases having length at least 2. */
 	for(i = 0; i < num_phrase_data; ++i)
 	{
 		levelPtr=root;
