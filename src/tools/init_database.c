@@ -80,7 +80,6 @@ typedef struct {
 typedef struct _tNODE {
 	TreeType data;
 	struct _tNODE *pFirstChild, *pNextSibling;
-	int index;
 } NODE;
 
 WordData word_data[MAX_WORD_DATA];
@@ -370,7 +369,6 @@ NODE *new_node( uint32_t key )
 	pnew->data.key = key;
 	pnew->pFirstChild = NULL;
 	pnew->pNextSibling=NULL;
-	pnew->index=-1;
 	return pnew;
 }
 
@@ -395,22 +393,16 @@ NODE *find_or_insert(NODE *parent, uint32_t key)
 	return pnew;
 }
 
-void insert_leaf(NODE *parent, long phr_pos, int freq, int word_index)
+void insert_leaf(NODE *parent, long phr_pos, int freq)
 {
 	NODE *prev=NULL, *p, *pnew;
 
-	if(word_index < 0) {
-		for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
-		if(p->data.phrase.freq <= freq) break;
-	}
-	else {
 	for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
-		if(p->index >= word_index) break;
-	}
+		if(p->data.phrase.freq <= freq) break;
+
 	pnew = new_node(0);
 	pnew->data.phrase.pos = (uint32_t)phr_pos;
 	pnew->data.phrase.freq = freq;
-	pnew->index = word_index;
 	if(prev == NULL)
 		parent->pFirstChild = pnew;
 	else
@@ -421,7 +413,7 @@ void insert_leaf(NODE *parent, long phr_pos, int freq, int word_index)
 void construct_phrase_tree()
 {
 	NODE *levelPtr;
-	int i, j, k;
+	int i, j;
 
 	/* First, assume that words are in order of their phones and indices. */
 	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
@@ -439,7 +431,6 @@ void construct_phrase_tree()
 		levelPtr = new_node( 0 );
 		levelPtr->data.phrase.pos = (uint32_t)word_data[i].text.pos;
 		levelPtr->data.phrase.freq = word_data[i].text.freq;
-		levelPtr->index = word_data[i].index;
 		levelPtr->pNextSibling = root->pFirstChild->pFirstChild;
 		root->pFirstChild->pFirstChild = levelPtr;
 	}
@@ -450,11 +441,7 @@ void construct_phrase_tree()
 		levelPtr=root;
 		for(j=0; phrase_data[i].phone[j]!=0; ++j)
 			levelPtr=find_or_insert(levelPtr, phrase_data[i].phone[j]);
-		k=-1;
-		if( phrase_data[i].phone[1] == 0) {
-			for(k=0; k<num_word_data && (phrase_data[i].phone[0] != word_data[k].text.phone[0] || strcmp(phrase_data[i].phrase, word_data[k].text.phrase) ); k++) ;
-		}
-		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq, k);
+		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq);
 	}
 }
 
