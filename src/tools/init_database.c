@@ -428,6 +428,22 @@ void construct_phrase_tree()
 
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
+
+	/* Second, insert word_data as the first level of children. */
+	for(i = 0; i < num_word_data; i++) {
+		if(i == 0 || word_data[i].text.phone[0] != word_data[i-1].text.phone[0]) {
+			levelPtr = new_node(word_data[i].text.phone[0]);
+			levelPtr->pNextSibling = root->pFirstChild;
+			root->pFirstChild = levelPtr;
+		}
+		levelPtr = new_node( 0 );
+		levelPtr->data.phrase.pos = (uint32_t)word_data[i].text.pos;
+		levelPtr->data.phrase.freq = word_data[i].text.freq;
+		levelPtr->index = word_data[i].index;
+		levelPtr->pNextSibling = root->pFirstChild->pFirstChild;
+		root->pFirstChild->pFirstChild = levelPtr;
+	}
+
 	for(i = 0; i < num_phrase_data; ++i)
 	{
 		levelPtr=root;
