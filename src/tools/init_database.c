@@ -112,16 +112,17 @@ void strip(char *line)
 	}
 }
 
+/* word_data is sorted reversely, for stack-like push operation. */
 int compare_word_by_phone(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
 
 	if (a->text.phone[0] != b->text.phone[0])
-		return a->text.phone[0] - b->text.phone[0];
+		return b->text.phone[0] - a->text.phone[0];
 
 	/* Compare original index for stable sort */
-	return a->index - b->index;
+	return b->index - a->index;
 }
 
 int compare_word_by_text(const void *x, const void *y)
