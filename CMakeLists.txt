@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8)
 project(libchewing)
 
-set(LIBCHEWING_VERSION 0.3.4)
+# Update configure.ac if LIBCHEWING_VERSION is changed.
+set(LIBCHEWING_VERSION 0.3.5)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 if(UNIX)
@@ -222,8 +223,10 @@ if(USE_VALGRIND)
 	endif()
 endif()
 
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 foreach(target ${ALL_TESTS})
 	add_executable(${target} ${TEST_SRC_DIR}/${target}.c)
+	add_dependencies(check ${target})
 endforeach()
 
 add_library(testhelper STATIC
