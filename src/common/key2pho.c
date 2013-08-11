@@ -14,7 +14,12 @@
 
 /**
  * @file key2pho.c
- * @brief map zuins to uint16_t type according to different kb_type
+ * @brief Bidirectional mapping between key-in sequences and indices.
+ * 
+ * 	1. Map zhuins to uint16_t type according to different kb_type.\n
+ * 		Build: Key <-> Zhuin plaintext <-> uint16_t\n
+ * 		Runtime: Key <-> Index to Zhuin Table <-> uint16_t\n
+ * 	2. Map generalized key-in sequences to uint32_t type.
  */
 
 /* This file is encoded in UTF-8 */
