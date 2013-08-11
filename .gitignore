@@ -91,6 +91,8 @@ test/*.trs
 # Generated tools/headers
 src/tools/init_database
 src/tools/init_database.exe
+data/gen_IM_data
+data/gen_IM_data.exe
 
 # gcov output
 *.gcda
