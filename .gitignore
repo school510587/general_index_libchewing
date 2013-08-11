@@ -41,7 +41,6 @@ include/stamp-h1
 
 # cmake generated files
 config.h
-chewing-definition.h
 
 # test suite
 test/genkeystroke
