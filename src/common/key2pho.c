@@ -28,6 +28,7 @@
 #include <string.h>
 #include "chewing-utf8-util.h"
 #include "chewing-private.h"
+#include "zuin-private.h" /* For KB_DEFAULT. */
 
 /* NOTE:
  * The reason why we convert string literal to hex representation is for the
@@ -201,6 +202,13 @@ uint16_t UintFromPhoneInx( const int ph_inx[] )
 	for ( i = 0; i < ZUIN_SIZE; i++ )
 		result |= ph_inx[ i ] << shift[ i ];
 	return result;
+}
+
+uint32_t EncodeZuinKey(const char *seq)
+{
+	char phone_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
+	PhoneFromKey(phone_buf, seq, KB_DEFAULT, 1);
+	return UintFromPhone(phone_buf);
 }
 
 uint32_t EncodeKeyin(const char *seq)
