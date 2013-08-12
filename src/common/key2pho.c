@@ -203,7 +203,7 @@ uint16_t UintFromPhoneInx( const int ph_inx[] )
 	return result;
 }
 
-uint32_t EncodeKeyin(const void *seq)
+uint32_t EncodeKeyin(const char *seq)
 {
 	uint32_t r = 0;
 	const unsigned char *p = (unsigned char*)seq;
