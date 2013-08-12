@@ -263,7 +263,6 @@ void read_tsi_src(const char *filename)
 
 void store_word(const char *line, const int line_num)
 {
-	char phone_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
 	char key_buf[ZUIN_SIZE + 1];
 	char buf[MAX_LINE_LEN];
 
@@ -288,8 +287,7 @@ void store_word(const char *line, const int line_num)
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
-	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].text.phone[0] = UintFromPhone(phone_buf);
+	word_data[num_word_data].text.phone[0] = EncodeZuinKey(key_buf);
 
 	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
