@@ -203,3 +203,25 @@ uint16_t UintFromPhoneInx( const int ph_inx[] )
 	return result;
 }
 
+uint32_t EncodeKeyin(const void *seq)
+{
+	uint32_t r = 0;
+	const unsigned char *p = (unsigned char*)seq;
+	for(; *p != '\0'; p++)
+		r = (r<<8) | *p;
+	return r;
+}
+
+/**
+ * Return "int" is designed for consistency with PHONEfROMuINT(). It raises some
+ * errors, because not all keys are corresponding to a zhuin symbol. But this
+ * function raises no error because of the generality of IM.
+ */
+int DecodeKeyin(char *buf, size_t len, uint32_t code)
+{
+	size_t end = min(4, len-1), i;
+	for(i = 0; i < end; i++)
+		buf[i] = ( code >> ( 8*(3-i) ) ) & 0xff;
+	buf[end] = '\0';
+	return 1;
+}
