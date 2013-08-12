@@ -61,7 +61,7 @@ const char USAGE[] =
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
 	int freq;
-	uint16_t phone[MAX_PHRASE_LEN + 1];
+	uint32_t phone[MAX_PHRASE_LEN + 1];
 	long pos;
 } PhraseData;
 
