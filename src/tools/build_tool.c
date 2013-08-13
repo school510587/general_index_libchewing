@@ -287,13 +287,14 @@ static void construct_phrase_tree()
  * It sponteneously converts tree structure into a linked list. Writing the tree
  * into index file is then implemented by pure sequential traversal.
  */
-void write_index_tree()
+void write_index_tree(const char *filename)
 {
 	/* (Circular) queue implementation is hidden within this function. */
 	NODE **queue, *p, *pNext;
 	int head=0, tail=0, tree_size=1;
 
-	FILE *output = fopen(PHONE_TREE_FILE, "wb");
+	assert( filename );
+	FILE *output = fopen(filename, "wb");
 
 	if ( ! output ) {
 		fprintf( stderr, "Error opening file " PHONE_TREE_FILE " for output.\n" );

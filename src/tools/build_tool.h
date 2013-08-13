@@ -32,6 +32,6 @@ extern int num_phrase_data;
 
 void strip(char *line);
 void read_IM_cin(const char *filename);
-void write_index_tree();
+void write_index_tree( const char *filename );
 
 #endif
