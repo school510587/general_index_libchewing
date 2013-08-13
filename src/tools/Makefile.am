@@ -1,4 +1,5 @@
 INCLUDES = \
+	-I$(top_srcdir)/tools \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/include/internal \
 	-I$(top_srcdir)/src \
@@ -12,6 +13,7 @@ noinst_PROGRAMS = init_database
 
 init_database_SOURCES = \
 	init_database.c \
+	build_tool.c \
 	$(top_srcdir)/src/common/chewing-utf8-util.c \
 	$(top_srcdir)/src/common/key2pho.c \
 	$(NULL)
