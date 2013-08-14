@@ -46,4 +46,8 @@ gen_IM_data_SOURCES = \
         $(top_srcdir)/src/common/key2pho.c \
         $(NULL)
 
+gen_IM_data_LDADD = \
+	$(top_srcdir)/src/porting_layer/src/libporting_layer.la \
+	$(NULL)
+
 CLEANFILES = $(datas) gendata_stamp gen_IM_data

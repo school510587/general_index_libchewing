@@ -1,4 +1,4 @@
-SUBDIRS = common porting_layer
+SUBDIRS = common
 INCLUDES = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/include/internal \
