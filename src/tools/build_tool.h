@@ -30,8 +30,22 @@ extern int num_word_data;
 extern PhraseData phrase_data[MAX_PHRASE_DATA];
 extern int num_phrase_data;
 
+/**
+ * @brief Strip reading whitespace and trailing comment / whitespace.
+ * @param line A buffer containing the line.
+ */
 void strip(char *line);
+
+/**
+ * @brief IM cin reader. Note that word_data is sorted by strcmp after the call.
+ * @param filename The path of cin file.
+ */
 void read_IM_cin(const char *filename);
+
+/**
+ * @brief Index tree writer.
+ * @param filename Path for output file.
+ */
 void write_index_tree( const char *filename );
 
 #endif
