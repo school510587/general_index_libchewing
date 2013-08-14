@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	read_IM_cin( argv[cin_path_id] );
+	read_IM_cin( argv[cin_path_id], EncodeKeyin );
 
 	/* Go to data/, where the exe is. */
 	chdir(dirname( argv[0] ));

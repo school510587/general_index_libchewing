@@ -100,7 +100,7 @@ static int compare_word_by_text(const void *x, const void *y)
 	return 0;
 }
 
-static void store_word(const char *line, const int line_num)
+static void store_word(const char *line, const int line_num, EncFunct encode)
 {
 	char key_buf[ZUIN_SIZE + 1];
 	char buf[MAX_LINE_LEN];
@@ -126,19 +126,21 @@ static void store_word(const char *line, const int line_num)
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
-	word_data[num_word_data].text.phone[0] = EncodeZuinKey(key_buf);
+	word_data[num_word_data].text.phone[0] = encode(key_buf);
 
 	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
 }
 
-void read_IM_cin(const char *filename)
+void read_IM_cin(const char *filename, EncFunct encode)
 {
 	FILE *phone_cin;
 	char buf[MAX_LINE_LEN];
 	char *ret;
 	int line_num = 0;
 	enum{INIT, HAS_CHARDEF_BEGIN, HAS_CHARDEF_END} status;
+
+	assert( encode );
 
 	phone_cin = fopen(filename, "r");
 	if (!phone_cin) {
@@ -186,7 +188,7 @@ void read_IM_cin(const char *filename)
 			}
 		}
 		else if(status == HAS_CHARDEF_BEGIN)
-			store_word(buf, line_num);
+			store_word(buf, line_num, encode);
 	}
 	fclose(phone_cin);
 

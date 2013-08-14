@@ -24,6 +24,8 @@ typedef struct {
 	int index; /* For stable sorting. */
 } WordData;
 
+typedef uint32_t (*EncFunct)( const char* );
+
 extern WordData word_data[MAX_WORD_DATA];
 extern int num_word_data;
 
@@ -40,7 +42,7 @@ void strip(char *line);
  * @brief IM cin reader. Note that word_data is sorted by strcmp after the call.
  * @param filename The path of cin file.
  */
-void read_IM_cin(const char *filename);
+void read_IM_cin(const char *filename, EncFunct);
 
 /**
  * @brief Index tree writer.
