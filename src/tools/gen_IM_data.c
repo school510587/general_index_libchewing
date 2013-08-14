@@ -1,3 +1,4 @@
+#include <dirent.h> /* For chdir(). */
 #include <libgen.h> /* For basename(). */
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +23,9 @@ int main(int argc, char *argv[])
 	}
 
 	read_IM_cin( argv[cin_path_id] );
+
+	/* Go to data/, where the exe is. */
+	chdir(dirname( argv[0] ));
 
 	return 0;
 }
