@@ -39,6 +39,12 @@ extern int num_phrase_data;
 void strip(char *line);
 
 /**
+ * @brief Word comparison by text of the word.
+ * @param x, y Words to be compared.
+ */
+int compare_word_by_text( const void *x, const void *y );
+
+/**
  * @brief IM cin reader. Note that word_data is sorted by strcmp after the call.
  * @param filename The path of cin file.
  */
