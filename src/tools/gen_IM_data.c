@@ -35,7 +35,7 @@ int compare_word_by_str(const void *x, const void *y)
 }
 
 /**
- * Find all possibilities of keyin sequences using given range in word_data for
+ * Find all probabilities of keyin sequences using given range in word_data for
  * each word. Note that width refers to the n-th enumerated word. The recursion
  * stops when the end of phrase is reached, whose interval has the same value in
  * "from" and "to" fields.
@@ -61,7 +61,7 @@ void find_keyin_sequence(const IntervalType range[], uint32_t keyin_buf[], int w
 }
 
 /**
- * The function enumerates all possibilities for a phrase. It fetches data of
+ * The function enumerates all probabilities for a phrase. It fetches data of
  * each word.  Considering that there may be many keyin methods for a word,
  * IntervalType is used to handle this circumstance. The return value indicates
  * position of '\0', satisfying the least access to the mmap for dictionary.
