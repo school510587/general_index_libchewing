@@ -2,6 +2,7 @@ tooldir = $(top_builddir)/src/tools
 datas = \
 	dictionary.dat \
 	index_tree.dat \
+	total_freq.dat \
 	$(NULL)
 static_tables = pinyin.tab swkb.dat symbols.dat
 
