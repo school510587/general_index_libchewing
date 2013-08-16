@@ -111,6 +111,21 @@ set(ALL_DATA
 	${DATA_BIN_DIR}/dictionary.dat
 	${DATA_BIN_DIR}/index_tree.dat
 	${DATA_BIN_DIR}/total_freq.dat
+	${DATA_BIN_DIR}/gen_IM_data
+)
+add_executable(gen_IM_data
+	${TOOLS_SRC_DIR}/gen_IM_data.c
+	${TOOLS_SRC_DIR}/build_tool.c
+	$<TARGET_OBJECTS:common>
+	-DUNDER_POSIX
+	${SRC_DIR}/porting_layer/include/plat_mmap.h
+	${SRC_DIR}/porting_layer/include/plat_path.h
+	${SRC_DIR}/porting_layer/include/plat_types.h
+	${SRC_DIR}/porting_layer/include/sys/plat_posix.h
+	${SRC_DIR}/porting_layer/include/sys/plat_windows.h
+	${SRC_DIR}/porting_layer/src/plat_mmap_posix.c
+	${SRC_DIR}/porting_layer/src/plat_mmap_windows.c
+	${SRC_DIR}/porting_layer/src/plat_path.c
 )
 
 set(ALL_INC
@@ -158,7 +173,10 @@ endforeach()
 
 # tools
 set(ALL_TOOLS init_database)
-add_executable(init_database ${TOOLS_SRC_DIR}/init_database.c $<TARGET_OBJECTS:common>)
+add_executable(init_database
+		${TOOLS_SRC_DIR}/init_database.c
+		${TOOLS_SRC_DIR}/build_tool.c
+		$<TARGET_OBJECTS:common>)
 set_target_properties(${ALL_TOOLS} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${TOOLS_BIN_DIR}
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TOOLS_BIN_DIR}
