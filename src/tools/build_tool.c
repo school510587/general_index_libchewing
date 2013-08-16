@@ -84,7 +84,7 @@ static int compare_word_by_phone(const void *x, const void *y)
 	return b->index - a->index;
 }
 
-static int compare_word_by_text(const void *x, const void *y)
+int compare_word_by_text(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;

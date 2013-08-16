@@ -48,7 +48,7 @@ void store_phrase(const char *line, int line_num)
 	char *freq;
 	char *bopomofo, bopomofo_buf[MAX_UTF8_SIZE*ZUIN_SIZE+1];
 	size_t phrase_len;
-	WordData word; /* For check. */
+	WordData word, *pWord;
 	int i;
 
 	strncpy(buf, line, sizeof(buf));
@@ -119,6 +119,13 @@ void store_phrase(const char *line, int line_num)
 #endif
 
 	if(phrase_len >= 2) ++num_phrase_data;
+	/* Please rewrite it when check is runnable. */
+	else {
+strcpy(word.text.phrase, phrase_data[num_phrase_data].phrase);
+		word.text.phone[0] = phrase_data[num_phrase_data].phone[0];
+		pWord = bsearch(&word, word_data, num_word_data, sizeof(word), compare_word_by_text);
+		if (pWord != NULL) pWord->text.freq = phrase_data[num_phrase_data].freq;
+	}
 }
 
 int compare_phrase(const void *x, const void *y)
@@ -163,13 +170,14 @@ void read_tsi_src(const char *filename)
 
 void write_phrase_data()
 {
-	FILE *dict_file;
+	FILE *dict_file, *freq_file;
 	PhraseData *cur_phr, *last_phr;
-	int i, j;
+	int total_freq = 0, i, j;
 
 	dict_file = fopen(DICT_FILE, "wb");
+	freq_file = fopen(FREQ_FILE, "wb");
 
-	if (!dict_file) {
+	if (!dict_file || !freq_file) {
 		fprintf(stderr, "Cannot open output file.\n");
 		exit(-1);
 	}
@@ -184,15 +192,22 @@ void write_phrase_data()
 		else if(j == num_phrase_data) cur_phr = &word_data[i++].text;
 		else cur_phr = strcmp(word_data[i].text.phrase, phrase_data[j].phrase)<0 ? &word_data[i++].text : &phrase_data[j++];
 
-		if(last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
+		if(last_phr && !strcmp(cur_phr->phrase, last_phr->phrase)) {
 			cur_phr->pos = last_phr->pos;
+			total_freq += cur_phr->freq;
+		}
 		else {
 			cur_phr->pos = ftell(dict_file);
 			fwrite(cur_phr->phrase, strlen(cur_phr->phrase)+1, 1, dict_file);
+			if( last_phr )
+				fwrite(&total_freq, 1, sizeof(total_freq), freq_file);
 		}
 	}
+	/* The last unwritten total_freq. */
+	fwrite(&total_freq, 1, sizeof(total_freq), freq_file);
 
 	fclose(dict_file);
+	fclose(freq_file);
 }
 
 int main(int argc, char *argv[])

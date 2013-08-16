@@ -39,6 +39,12 @@ extern int num_phrase_data;
 void strip(char *line);
 
 /**
+ * @brief Comparison between 2 words first by string and second by phone.
+ * @raram x, y Two compared words.
+ */
+int compare_word_by_text( const void *x, const void *y );
+
+/**
  * @brief IM cin reader. Note that word_data is sorted by strcmp after the call.
  * @param filename The path of cin file.
  */

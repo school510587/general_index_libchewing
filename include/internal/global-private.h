@@ -15,6 +15,7 @@
 
 #define PHONE_TREE_FILE		"index_tree.dat"
 #define DICT_FILE		"dictionary.dat"
+#define FREQ_FILE 		"total_freq.dat"
 #define SYMBOL_TABLE_FILE	"symbols.dat"
 #define SOFTKBD_TABLE_FILE	"swkb.dat"
 #define CHEWING_DEFINITION_FILE "chewing-definition.h"
