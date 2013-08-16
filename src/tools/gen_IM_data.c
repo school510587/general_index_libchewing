@@ -111,11 +111,12 @@ const char *enumerate_keyin_sequence(const char *phrase)
 
 int main(int argc, char *argv[])
 {
-	plat_mmap dict_map;
-	long dict_size;
+	plat_mmap dict_map, freq_map;
+	long dict_size, freq_size;
 	size_t offset=0, csize;
 	const char *dict, *p;
-	int cin_path_id;
+	const int32_t *freq;
+	int cin_path_id, phr_id = 0;
 
 	for(cin_path_id = 1; cin_path_id < argc; cin_path_id++){
 		size_t l = strlen( argv[cin_path_id] );
@@ -142,9 +143,20 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
+	plat_mmap_set_invalid(&freq_map);
+	freq_size = plat_mmap_create(&freq_map, FREQ_FILE, FLAG_ATTRIBUTE_READ);
+	csize = freq_size;
+	freq = (const int32_t*)plat_mmap_set_view(&freq_map, &offset, &csize);
+
+	if( !freq ) {
+		fprintf(stderr, "%s: Error reading system frequency table.\n", argv[0]);
+		exit(-1);
+	}
+
 	for(p = dict; p < dict+dict_size; p++)
 		p = enumerate_keyin_sequence( p );
 
 	plat_mmap_close(&dict_map);
+	plat_mmap_close(&freq_map);
 	return 0;
 }
