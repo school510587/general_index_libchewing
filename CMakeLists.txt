@@ -110,6 +110,7 @@ set(INFO_BIN ${PROJECT_BINARY_DIR}/doc/libchewing.info)
 set(ALL_DATA
 	${DATA_BIN_DIR}/dictionary.dat
 	${DATA_BIN_DIR}/index_tree.dat
+	${DATA_BIN_DIR}/total_freq.dat
 )
 
 set(ALL_INC
