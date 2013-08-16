@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "build_tool.h"
+#include "private.h"
 
 #define CIN_EXTENSION ".cin"
 
@@ -66,7 +67,7 @@ void find_keyin_sequence(const IntervalType range[], uint32_t keyin_buf[], int w
  * IntervalType is used to handle this circumstance. The return value indicates
  * position of '\0', satisfying the least access to the mmap for dictionary.
  */
-const char *enumerate_keyin_sequence(const char *phrase)
+const char *enumerate_keyin_sequence(const char *phrase, int32_t total_freq)
 {
 	IntervalType range[MAX_PHRASE_LEN + 1] = {0};
 	uint32_t keyin_buf[MAX_PHRASE_LEN + 1] = {0};
@@ -74,9 +75,8 @@ const char *enumerate_keyin_sequence(const char *phrase)
 	WordData tmpWord, *q, *r;
 	int old_num_phrase_data = num_phrase_data, i;
 
-	/* Not handle null or length-one phrases. */
-	if( *p == '\0' || phrase[ueBytesFromChar(*phrase)] == '\0' )
-		return phrase + ueBytesFromChar(*phrase);
+	/* Null phrases are rejected. */
+	if( *p == '\0') return p;
 
 	/* Set up range of each word in word_data. */
 	for(i = 0; *p; i++) {
@@ -96,16 +96,20 @@ const char *enumerate_keyin_sequence(const char *phrase)
 			return p;
 		}
 	}
+	/* Length-one phrases. */
+	if( range[1].from == range[1].to )
+		for(i = range[0].from; i < range[0].to; i++)
+			word_data[i].text.freq = CEIL_DIV(total_freq, range[0].to - range[0].from);
+	else {
+		/* Note: 0 means the first (0th) word is referenced. */
+		find_keyin_sequence( range, keyin_buf, 0);
 
-	/* Note: 0 means the first (0th) word is referenced. */
-	find_keyin_sequence( range, keyin_buf, 0);
-
-	/* FIXME: freq cannot be quickly obtained under the new structure. */
-	for( i = old_num_phrase_data; i < num_phrase_data; i++) {
-		strcpy(phrase_data[i].phrase, phrase);
-		phrase_data[i].freq = 1;
+		/* Set all data in phrase_data. */
+		for( i = old_num_phrase_data; i < num_phrase_data; i++) {
+			strcpy(phrase_data[i].phrase, phrase);
+			phrase_data[i].freq = CEIL_DIV(total_freq, num_phrase_data - old_num_phrase_data);
+		}
 	}
-
 	return p;
 }
 
@@ -154,7 +158,7 @@ int main(int argc, char *argv[])
 	}
 
 	for(p = dict; p < dict+dict_size; p++)
-		p = enumerate_keyin_sequence( p );
+		p = enumerate_keyin_sequence( p, freq[phr_id++] );
 
 	plat_mmap_close(&dict_map);
 	plat_mmap_close(&freq_map);
