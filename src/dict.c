@@ -31,7 +31,7 @@ typedef struct {
 	const char *text;
 } Dict_Instance;
 
-/* Let system dictionary has only an instance. */
+/* Let system dictionary have only one instance. */
 static Dict_Instance sys_dict;
 
 void TerminateDict()
