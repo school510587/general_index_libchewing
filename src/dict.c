@@ -24,36 +24,47 @@
 #include "plat_mmap.h"
 #include "dict-private.h"
 #include "memory-private.h"
+#include "private.h"
 
-void TerminateDict( ChewingData *pgdata )
+typedef struct {
+	plat_mmap mmap;
+	const char *text;
+} Dict_Instance;
+
+/* Let system dictionary has only an instance. */
+static Dict_Instance sys_dict;
+
+void TerminateDict()
 {
-	plat_mmap_close( &pgdata->static_data.dict_mmap );
+	if( ctx_count == 0) {
+		plat_mmap_close( &sys_dict.mmap );
+		sys_dict.text = NULL;
+	}
 }
 
-int InitDict( ChewingData *pgdata, const char *prefix )
+int InitDict( const char *prefix )
 {
-	char filename[ PATH_MAX ];
-	size_t len;
-	size_t offset;
-	size_t file_size;
-	size_t csize;
+	if( ctx_count == 0) {
+		char filename[ PATH_MAX ];
+		size_t len, offset, file_size, csize;
 
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, DICT_FILE );
-	if ( len + 1 > sizeof( filename ) )
-		return -1;
+		len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, DICT_FILE );
+		if ( len + 1 > sizeof( filename ) )
+			return -1;
 
-	plat_mmap_set_invalid( &pgdata->static_data.dict_mmap );
-	file_size = plat_mmap_create( &pgdata->static_data.dict_mmap, filename, FLAG_ATTRIBUTE_READ );
-	if ( file_size <= 0 )
-		return -1;
+		plat_mmap_set_invalid( &sys_dict.mmap );
+		file_size = plat_mmap_create( &sys_dict.mmap, filename, FLAG_ATTRIBUTE_READ );
+		if ( file_size <= 0 )
+			return -1;
 
-	offset = 0;
-	csize = file_size;
-	pgdata->static_data.dict = (const char*)plat_mmap_set_view( &pgdata->static_data.dict_mmap, &offset, &csize );
-	if ( !pgdata->static_data.dict )
-		return -1;
+		offset = 0;
+		csize = file_size;
+		sys_dict.text = (const char*)plat_mmap_set_view( &sys_dict.mmap, &offset, &csize );
+		if ( !sys_dict.text )
+			return -1;
 
-	return 0;
+		return 0;
+	}
 }
 
 static int CompTreeType( const void *a, const void *b )
@@ -68,7 +79,7 @@ static int CompTreeType( const void *a, const void *b )
 static void GetVocabFromDict( ChewingData *pgdata, Phrase *phr_ptr )
 {
 	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ];
-	strcpy(phr_ptr->phrase, pgdata->static_data.dict + pLeaf->phrase.pos);
+	strcpy(phr_ptr->phrase, sys_dict.text + pLeaf->phrase.pos);
 	phr_ptr->freq = pLeaf->phrase.freq;
 	pgdata->static_data.tree_cur_pos++;
 }

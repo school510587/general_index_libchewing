@@ -22,7 +22,7 @@
 int GetCharFirst( ChewingData *, Phrase *, uint16_t );
 int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phone_phr_id );
 int GetVocabNext ( ChewingData *pgdata, Phrase *phr_ptr );
-int InitDict( ChewingData *pgdata, const char * prefix );
-void TerminateDict( ChewingData *pgdata );
+int InitDict( const char * prefix );
+void TerminateDict();
 
 #endif

@@ -141,6 +141,9 @@ CHEWING_API ChewingContext *chewing_new()
 	char search_path[PATH_MAX];
 	char path[PATH_MAX];
 
+	while( mutex_lock );
+	mutex_lock = 1;
+
 	ctx = ALC( ChewingContext, 1 );
 	if ( !ctx )
 		goto error;
@@ -163,7 +166,7 @@ CHEWING_API ChewingContext *chewing_new()
 		search_path, DICT_FILES, path, sizeof( path ) );
 	if ( ret )
 		goto error;
-	ret = InitDict( ctx->data, path );
+	ret = InitDict( path );
 	if ( ret )
 		goto error;
 	ret = InitTree( ctx->data, path );
@@ -200,10 +203,15 @@ CHEWING_API ChewingContext *chewing_new()
 	if ( !ret )
 		goto error;
 
-	return ctx;
+	ctx_count++;
+	goto finish;
+
 error:
 	chewing_delete( ctx );
-	return NULL;
+	ctx = NULL;
+finish:
+	mutex_lock = 0;
+	return ctx;
 }
 
 CHEWING_API int chewing_Init(
@@ -278,19 +286,25 @@ CHEWING_API void chewing_Terminate()
 CHEWING_API void chewing_delete( ChewingContext *ctx )
 {
 	if ( ctx ) {
+		while( mutex_lock );
+		mutex_lock = 1;
+
+		ctx_count--;
 		if ( ctx->data ) {
 			TerminatePinyin( ctx->data );
 			TerminateEasySymbolTable( ctx->data );
 			TerminateSymbolTable( ctx->data );
 			TerminateHash( ctx->data );
 			TerminateTree( ctx->data );
-			TerminateDict( ctx->data );
+			TerminateDict();
 			free( ctx->data );
 		}
 
 		if ( ctx->output )
 			free( ctx->output);
 		free( ctx );
+
+		mutex_lock = 0;
 	}
 	return;
 }
