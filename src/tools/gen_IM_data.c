@@ -161,6 +161,9 @@ int main(int argc, char *argv[])
 	for(p = dict; p < dict+dict_size; p++)
 		p = enumerate_keyin_sequence( p, freq[phr_id++] );
 
+	strcat(IM_name, "_" PHONE_TREE_FILE);
+	write_index_tree( IM_name );
+
 	plat_mmap_close(&dict_map);
 	plat_mmap_close(&freq_map);
 	return 0;
