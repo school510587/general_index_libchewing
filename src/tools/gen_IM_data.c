@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 	plat_mmap dict_map, freq_map;
 	long dict_size, freq_size;
 	size_t offset=0, csize;
+	char IM_name[PATH_MAX];
 	const char *dict, *p;
 	const int32_t *freq;
 	int cin_path_id, phr_id = 0;
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	read_IM_cin( argv[cin_path_id], EncodeKeyin );
+	read_IM_cin( argv[cin_path_id], IM_name, EncodeKeyin );
 
 	/* Go to data/, where the exe is. */
 	chdir(dirname( argv[0] ));

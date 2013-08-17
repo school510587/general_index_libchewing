@@ -26,6 +26,7 @@
 #include "private.h" /* For ALC macro. */
 
 /* Important tokens in a cin file. */
+#define ENAME            "%ename"
 #define CHARDEF		 "%chardef"
 #define BEGIN		   "begin"
 #define END		     "end"
@@ -132,7 +133,7 @@ static void store_word(const char *line, const int line_num, EncFunct encode)
 	++num_word_data;
 }
 
-void read_IM_cin(const char *filename, EncFunct encode)
+void read_IM_cin(const char *filename, char *IM_name, EncFunct encode)
 {
 	FILE *phone_cin;
 	char buf[MAX_LINE_LEN];
@@ -160,8 +161,13 @@ void read_IM_cin(const char *filename, EncFunct encode)
 		strip( buf );
 		if( buf[0]=='%') {
 			ret = strtok(buf, " \t");
-			if(!strcmp(ret, CHARDEF))
-			{
+			if(!strcmp(ret, ENAME)) {
+				if( IM_name ) {
+					ret = strtok(NULL, " \t");
+					if(ret) strcpy(IM_name, ret);
+				}
+			}
+			else if(!strcmp(ret, CHARDEF)) {
 				ret = strtok(NULL, " \t");
 				switch(status)
 				{

@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	read_IM_cin(argv[1], EncodeZuinKey);
+	read_IM_cin(argv[1], NULL, EncodeZuinKey);
 	read_tsi_src(argv[2]);
 	write_phrase_data();
 	write_index_tree(PHONE_TREE_FILE);

@@ -47,8 +47,10 @@ int compare_word_by_text( const void *x, const void *y );
 /**
  * @brief IM cin reader. Note that word_data is sorted by strcmp after the call.
  * @param filename The path of cin file.
+ * @param IM_name  Buffer for name of the IM, can be NULL.
+ * @param encode   The way encoding keyin sequence into uint32_t, non-NULL.
  */
-void read_IM_cin(const char *filename, EncFunct);
+void read_IM_cin(const char *filename, char *IM_name, EncFunct encode);
 
 /**
  * @brief Index tree writer.
