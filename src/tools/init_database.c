@@ -15,7 +15,10 @@
  *
  *	This program reads in source of dictionary.\n
  *	Output a database file containing a phone phrase tree, and a dictionary file\n
- * filled with non-duplicate phrases.\n
+ * containing non-duplicate phrases. To determine frequency of each phrase in\n
+ * generation of other IM index, it outputs a log of 32-bit binary integers recording\n
+ * total frequency for each non-duplicate phrase for build-time requirement of other\n
+ * IM index.\n
  *	Each node represents a single phone.\n
  *	The output file contains a random access array, where each record includes:\n
  *	\code{
@@ -38,6 +41,7 @@ const char USAGE[] =
 	"This program creates the following new files:\n"
 	"* " PHONE_TREE_FILE "\n\tindex to phrase file (dictionary)\n"
 	"* " DICT_FILE "\n\tmain phrase file\n"
+	"* " FREQ_FILE "\n\tlog of total frequency\n"
 ;
 
 void store_phrase(const char *line, int line_num)
