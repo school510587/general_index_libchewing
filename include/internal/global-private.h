@@ -18,7 +18,6 @@
 #define FREQ_FILE 		"total_freq.dat"
 #define SYMBOL_TABLE_FILE	"symbols.dat"
 #define SOFTKBD_TABLE_FILE	"swkb.dat"
-#define CHEWING_DEFINITION_FILE "chewing-definition.h"
 #define PINYIN_TAB_NAME         "pinyin.tab"
 
 #endif
