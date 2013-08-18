@@ -106,12 +106,12 @@ int GetCharFirst( ChewingData *pgdata, Phrase *wrd_ptr, uint16_t key )
  * the function initializes reading position (tree_cur_pos) and ending position
  * (tree_end_pos), and fetches the first phrase into phr_ptr.
  */
-int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phrase_parent_id )
+int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, const TreeType *phrase_parent )
 {
-	assert( ( 0 <= phrase_parent_id ) && ( phrase_parent_id * sizeof(TreeType) < pgdata->static_data.tree_size ) );
+	assert( phrase_parent );
 
-	pgdata->static_data.tree_cur_pos = pgdata->static_data.tree[ phrase_parent_id ].child.begin;
-	pgdata->static_data.tree_end_pos = pgdata->static_data.tree[ phrase_parent_id ].child.end;
+	pgdata->static_data.tree_cur_pos = phrase_parent->child.begin;
+	pgdata->static_data.tree_end_pos = phrase_parent->child.end;
 	GetVocabFromDict( pgdata, phr_ptr );
 	return 1;
 }

@@ -76,7 +76,7 @@ static void SetAvailInfo( ChewingData *pgdata, int begin, int end)
 	int nPhoneSeq = pgdata->nPhoneSeq;
 	const int *bSymbolArrBrkpt = pgdata->bSymbolArrBrkpt;
 
-	int pho_id;
+	const TreeType *tree_pos;
 	int diff;
 	uint16_t userPhoneSeq[ MAX_PHONE_SEQ_LEN ];
 
@@ -111,12 +111,12 @@ static void SetAvailInfo( ChewingData *pgdata, int begin, int end)
 
 	while ( head <= head_tmp && tail_tmp <= tail ) {
 		diff = tail_tmp - head_tmp;
-		pho_id = TreeFindPhrase( pgdata, head_tmp, tail_tmp, phoneSeq );
+		tree_pos = TreeFindPhrase( pgdata, head_tmp, tail_tmp, phoneSeq );
 
-		if ( pho_id != -1 ) {
+		if ( tree_pos ) {
 			/* save it! */
 			pai->avail[ pai->nAvail ].len = diff + 1;
-			pai->avail[ pai->nAvail ].id = pho_id;
+			pai->avail[ pai->nAvail ].id = tree_pos;
 			pai->nAvail++;
 		}
 		else {
@@ -128,11 +128,11 @@ static void SetAvailInfo( ChewingData *pgdata, int begin, int end)
 			if ( UserGetPhraseFirst( pgdata, userPhoneSeq ) ) {
 				/* save it! */
 				pai->avail[ pai->nAvail ].len = diff + 1;
-				pai->avail[ pai->nAvail ].id = -1;
+				pai->avail[ pai->nAvail ].id = NULL;
 				pai->nAvail++;
 			} else {
 				pai->avail[ pai->nAvail ].len = 0;
-				pai->avail[ pai->nAvail ].id = -1;
+				pai->avail[ pai->nAvail ].id = NULL;
 			}
 		}
 
@@ -282,7 +282,7 @@ static void SetChoiceInfo( ChewingData *pgdata )
 	}
 	/* phrase */
 	else {
-		if ( pai->avail[ pai->currentAvail ].id != -1 ) {
+		if ( pai->avail[ pai->currentAvail ].id ) {
 			GetPhraseFirst( pgdata, &tempPhrase, pai->avail[ pai->currentAvail ].id );
 			do {
 				if ( ChoiceTheSame(
