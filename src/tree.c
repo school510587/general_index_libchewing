@@ -242,9 +242,11 @@ static int CompTreeType( const void *a, const void *b )
 	return ( ((TreeType*)a)->key - ((TreeType*)b)->key );
 }
 
-/** @brief search for the phrases have the same pronunciation.*/
-/* if phoneSeq[begin] ~ phoneSeq[end] is a phrase, then add an interval
- * from (begin) to (end+1) */
+/**
+ * @brief search for phrases with the same input keys.
+ * if phoneSeq[begin] ~ phoneSeq[end] is a phrase, then add an interval
+ * from (begin) to (end+1)
+ */
 const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const uint16_t *phoneSeq )
 {
 	TreeType target;
