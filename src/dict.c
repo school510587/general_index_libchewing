@@ -86,13 +86,9 @@ static void GetVocabFromDict( ChewingData *pgdata, Phrase *phr_ptr )
 
 int GetCharFirst( ChewingData *pgdata, Phrase *wrd_ptr, uint16_t key )
 {
-	const TreeType *pinx;
-	TreeType keyNode = {0};
-	keyNode.key = key;
-	pinx = (const TreeType*) bsearch(
-		&keyNode, pgdata->static_data.tree + pgdata->static_data.tree[0].child.begin,
-		pgdata->static_data.tree[0].child.end - pgdata->static_data.tree[0].child.begin,
-	sizeof( TreeType ), CompTreeType );
+	/* &key serves as an array whose begin and end are both 0. */
+	const TreeType *pinx = TreeFindPhrase( pgdata, 0, 0, &key );
+
 	if ( ! pinx )
 		return 0;
 	pgdata->static_data.tree_cur_pos = pinx->child.begin;
