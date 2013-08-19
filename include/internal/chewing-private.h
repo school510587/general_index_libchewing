@@ -162,7 +162,7 @@ typedef struct {
 	const TreeType *tree;
 	size_t tree_size;
 	plat_mmap tree_mmap;
-	int tree_cur_pos, tree_end_pos;
+	const TreeType *tree_cur_pos, *tree_end_pos;
 
 	int chewing_lifetime;
 

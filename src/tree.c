@@ -267,6 +267,15 @@ const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const u
 	else return tree_p;
 }
 
+/**
+ * @brief get child range of a given parent node.
+ */
+void TreeChildRange( ChewingData *pgdata, const TreeType *parent )
+{
+	pgdata->static_data.tree_cur_pos = pgdata->static_data.tree + parent->child.begin;
+	pgdata->static_data.tree_end_pos = pgdata->static_data.tree + parent->child.end;
+}
+
 static void AddInterval(
 		TreeDataType *ptd, int begin , int end,
 		Phrase *p_phrase, int dict_or_user )
