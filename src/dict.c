@@ -24,6 +24,7 @@
 #include "plat_mmap.h"
 #include "dict-private.h"
 #include "memory-private.h"
+#include "tree-private.h"
 #include "private.h"
 
 typedef struct {
@@ -63,13 +64,8 @@ int InitDict( const char *prefix )
 		if ( !sys_dict.text )
 			return -1;
 
-		return 0;
 	}
-}
-
-static int CompTreeType( const void *a, const void *b )
-{
-	return ( ((TreeType*)a)->key - ((TreeType*)b)->key );
+	return 0;
 }
 
 /*
