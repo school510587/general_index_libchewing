@@ -48,7 +48,4 @@ typedef int (*CompFuncType)( const void *, const void * );
 
 #define __stringify(x)  #x
 
-/* Global counter of context instances, for maintaining least static data. */
-static ctx_count = 0, mutex_lock = 0;
-
 #endif
