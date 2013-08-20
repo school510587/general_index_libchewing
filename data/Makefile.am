@@ -1,9 +1,9 @@
-tooldir = $(top_builddir)/src/tools
 datas = \
 	dictionary.dat \
 	index_tree.dat \
 	total_freq.dat \
 	$(NULL)
+
 static_tables = pinyin.tab swkb.dat symbols.dat
 
 dist_noinst_DATA = \
@@ -29,20 +29,27 @@ gendata_stamp: phone.cin tsi.src
 	touch $@
 
 gendata:
-	env LC_ALL=C $(tooldir)/init_database$(EXEEXT) $(top_srcdir)/data/phone.cin $(top_srcdir)/data/tsi.src
+	env LC_ALL=C $(top_srcdir)/data/init_database$(EXEEXT) $(top_srcdir)/data/phone.cin $(top_srcdir)/data/tsi.src
 INCLUDES = \
-	-I$(tooldir) \
+	-I$(top_srcdir)/data/src \
         -I$(top_srcdir)/include \
         -I$(top_srcdir)/include/internal \
         -I$(top_srcdir)/src \
         -I$(top_srcdir)/src/porting_layer/include \
         $(NULL)
 CC = $(CC_FOR_BUILD)
-AM_CFLAGS = $(CFLAGS_FOR_BUILD)
-noinst_PROGRAMS = gen_IM_data
+AM_CFLAGS = $(CFLAGS_FOR_BUIlD)
+
+noinst_PROGRAMS = init_database gen_IM_data
+init_database_SOURCES = \
+	$(top_srcdir)/data/src/init_database.c \
+	$(top_srcdir)/data/src/build_tool.c \
+	$(top_srcdir)/src/common/chewing-utf8-util.c \
+	$(top_srcdir)/src/common/key2pho.c \
+	$(NULL)
 gen_IM_data_SOURCES = \
-        $(tooldir)/gen_IM_data.c \
-	$(tooldir)/build_tool.c \
+	$(top_srcdir)/data/src/gen_IM_data.c \
+	$(top_srcdir)/data/src/build_tool.c \
         $(top_srcdir)/src/common/chewing-utf8-util.c \
         $(top_srcdir)/src/common/key2pho.c \
         $(NULL)
@@ -51,4 +58,4 @@ gen_IM_data_LDADD = \
 	$(top_srcdir)/src/porting_layer/src/libporting_layer.la \
 	$(NULL)
 
-CLEANFILES = $(datas) gendata_stamp gen_IM_data
+CLEANFILES = $(datas) gendata_stamp init_database gen_IM_data
