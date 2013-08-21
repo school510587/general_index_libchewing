@@ -160,9 +160,11 @@ CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
 	if ( !ctx->data )
 		goto error;
 
-	ctx->data->static_data.IM_name = strdup( IM_name );
+	ctx->data->static_data.IM_name = (char*)malloc( strlen(IM_name)+2 );
 	if( !ctx->data->static_data.IM_name )
 		goto error;
+	strcpy( ctx->data->static_data.IM_name, IM_name );
+	if( IM_name[0] ) strcat( ctx->data->static_data.IM_name, "_" );
 
 	chewing_Reset( ctx );
 
