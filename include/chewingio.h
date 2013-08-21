@@ -558,4 +558,12 @@ CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	void (*logger)( void *data, int level, const char *fmt, ... ),
 	void *data );
 
+/**
+ * @brief IM switcher.
+ * @param ctx
+ * @param IM_name Destination of IM switch.
+ * @retval 1 on success; 0 on failure or the same destination as source in ctx.
+ */
+CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name );
+
 #endif /* _CHEWING_IO_H */
