@@ -20,6 +20,7 @@
  *  \author libchewing Core Team
  */
 
+#include <stddef.h>
 #include "global.h"
 
 #define KEYSTROKE_IGNORE 1
@@ -557,6 +558,14 @@ CHEWING_API int chewing_get_phoneSeqLen( ChewingContext *ctx );
 CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	void (*logger)( void *data, int level, const char *fmt, ... ),
 	void *data );
+
+/**
+ * @brief Get IM name from context.
+ * @param buffer Your buffer for result, NULL is ok.
+ * @param buf_size Size of your buffer, ignored when NULL buffer.
+ * @retval Your buffer when not NULL; memory from malloc() when NULL.
+ */
+CHEWING_API char *chewing_get_IM( ChewingContext *ctx, char *buffer, size_t buf_size );
 
 /**
  * @brief IM switcher.

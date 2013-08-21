@@ -1445,6 +1445,21 @@ CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	ctx->data->loggerData = data;
 }
 
+CHEWING_API char *chewing_get_IM( ChewingContext *ctx, char *buffer, size_t buf_size )
+{
+	size_t out_len = strlen( ctx->data->static_data.IM_name )-1;
+
+	if( out_len == 0 ) out_len = strlen("Phonetic");
+	if( buffer && out_len >= buf_size ) out_len = buf_size-1;
+
+	if( !buffer ) buffer = (char*)malloc( out_len+1 );
+
+	strncpy( buffer, ctx->data->static_data.IM_name, out_len );
+	buffer[out_len] = '\0';
+
+	return buffer;
+}
+
 CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name )
 {
 	char search_path[PATH_MAX], path[PATH_MAX];
