@@ -136,6 +136,11 @@ static ChewingData * allocate_ChewingData()
 
 CHEWING_API ChewingContext *chewing_new()
 {
+	return chewing_new_IM("");
+}
+
+CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
+{
 	ChewingContext *ctx;
 	int ret;
 	char search_path[PATH_MAX];

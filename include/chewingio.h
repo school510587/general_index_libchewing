@@ -180,6 +180,13 @@ CHEWING_API int chewing_handle_Numlock( ChewingContext *ctx, int key);
 CHEWING_API ChewingContext *chewing_new();
 
 /**
+ * @brief Create new handle of the instance for Chewing IM in your IM name
+ * @param IM_name Name of your IM, default to Phonetic IM.
+ * @see chewing_delete()
+ */
+CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name );
+
+/**
  * @brief Release the handle and internal memory by given Chewing instance
  * @see chewing_new()
  *
