@@ -182,6 +182,8 @@ typedef struct _SymbolEntry {
 } SymbolEntry;
 
 typedef struct {
+	char *IM_name;
+
 	const TreeType *tree;
 	size_t tree_size;
 	plat_mmap tree_mmap;
