@@ -146,6 +146,8 @@ CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
 	char search_path[PATH_MAX];
 	char path[PATH_MAX];
 
+	if( !IM_name ) IM_name = "";
+
 	ctx = ALC( ChewingContext, 1 );
 	if ( !ctx )
 		goto error;
@@ -156,6 +158,10 @@ CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
 
 	ctx->data = allocate_ChewingData();
 	if ( !ctx->data )
+		goto error;
+
+	ctx->data->static_data.IM_name = strdup( IM_name );
+	if( !ctx->data->static_data.IM_name )
 		goto error;
 
 	chewing_Reset( ctx );
@@ -290,6 +296,7 @@ CHEWING_API void chewing_delete( ChewingContext *ctx )
 			TerminateHash( ctx->data );
 			TerminateTree( ctx->data );
 			TerminateDict( ctx->data );
+			if( ctx->data->static_data.IM_name ) free( ctx->data->static_data.IM_name );
 			free( ctx->data );
 		}
 
