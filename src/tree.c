@@ -86,7 +86,7 @@ int InitTree( ChewingData *pgdata, const char * prefix )
 	size_t len;
 	size_t offset;
 
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, PHONE_TREE_FILE );
+	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s%s", prefix, pgdata->static_data.IM_name, PHONE_TREE_FILE );
 	if ( len + 1 > sizeof( filename ) )
 		return -1;
 
