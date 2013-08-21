@@ -55,11 +55,6 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 	return 0;
 }
 
-static int CompTreeType( const void *a, const void *b )
-{
-	return ( ((TreeType*)a)->key - ((TreeType*)b)->key );
-}
-
 /*
  * The function gets string of vocabulary from dictionary and its frequency from
  * tree index mmap, and stores them into buffer given by phr_ptr.
