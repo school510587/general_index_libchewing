@@ -93,7 +93,7 @@ static int IsDefPhoEndKey( int key, int kbtype )
 static int EndKeyProcess( ChewingData *pgdata, int key, int searchTimes )
 {
 	ZuinData *pZuin = &(pgdata->zuinData);
-	uint16_t u16Pho, u16PhoAlt;
+	KeySeqWord u16Pho, u16PhoAlt;
 	Phrase tempword;
 	int pho_inx;
 

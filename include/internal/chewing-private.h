@@ -61,7 +61,7 @@ static inline int min( int a, int b )
 
 typedef union {
 	unsigned char s[ MAX_UTF8_SIZE + 1];
-	uint16_t wch;
+	KeySeqWord wch;
 } wch_t;
 
 /*
@@ -102,8 +102,8 @@ typedef struct {
 	int kbtype;
 	int pho_inx[ ZUIN_SIZE ];
 	int pho_inx_alt[ ZUIN_SIZE ];
-	uint16_t phone;
-	uint16_t phoneAlt;
+	KeySeqWord phone;
+	KeySeqWord phoneAlt;
 	PinYinData pinYinData;
 } ZuinData;
 
@@ -203,8 +203,8 @@ typedef struct tag_ChewingData {
 	wch_t showMsg[ MAX_PHONE_SEQ_LEN ];
 	int showMsgLen;
 
-	uint16_t phoneSeq[ MAX_PHONE_SEQ_LEN ];
-	uint16_t phoneSeqAlt[ MAX_PHONE_SEQ_LEN ];
+	KeySeqWord phoneSeq[ MAX_PHONE_SEQ_LEN ];
+	KeySeqWord phoneSeqAlt[ MAX_PHONE_SEQ_LEN ];
 	int nPhoneSeq;
 	char selectStr[ MAX_PHONE_SEQ_LEN ][ MAX_PHONE_SEQ_LEN * MAX_UTF8_SIZE + 1 ];
 	IntervalType selectInterval[ MAX_PHONE_SEQ_LEN ];

@@ -22,9 +22,9 @@
 #define inline __inline
 #endif
 
-static inline uint16_t GetUint16( const char *ptr )
+static inline KeySeqWord GetUint16( const char *ptr )
 {
-	uint16_t val;
+	KeySeqWord val;
 #if WORDS_BIGENDIAN
 	val =
 		( ptr[0] << 8 ) |
@@ -37,7 +37,7 @@ static inline uint16_t GetUint16( const char *ptr )
 	return val;
 }
 
-static inline void PutUint16( uint16_t val, char *ptr )
+static inline void PutUint16( KeySeqWord val, char *ptr )
 {
 #if WORDS_BIGENDIAN
 	ptr[0] = ( val >> 8 ) & 0xff;

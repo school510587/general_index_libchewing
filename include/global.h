@@ -99,4 +99,9 @@ typedef struct _ChewingContext ChewingContext;
  */
 #define HSU_SELKEY_TYPE2 2
 
+/**
+ * @brief Record of a key-in sequence corresponding to a word.
+ */
+typedef unsigned short KeySeqWord;
+
 #endif
