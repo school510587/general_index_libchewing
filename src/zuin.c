@@ -638,10 +638,22 @@ static int PinYinInput( ChewingData *pgdata, int key )
 	return ZUIN_ABSORB;
 }
 
+static int NonZuinInput( ChewingData *pgdata, int key )
+{
+	ZuinData *pZuin = &(pgdata->zuinData);
+	int i;
+
+	for(i = 0; i < ZUIN_SIZE && pZuin->pho_inx[i]; i++ );
+	pZuin->pho_inx[i] = key;
+	return 0;
+}
+
 /* key: ascii code of input, including space */
 int ZuinPhoInput( ChewingData *pgdata, int key )
 {
 	ZuinData *pZuin = &(pgdata->zuinData);
+	if( pgdata->static_data.IM_name[0] )
+		return NonZuinInput( pgdata, key );
 	switch ( pZuin->kbtype ) {
 		case KB_HSU:
 		case KB_DVORAK_HSU:
