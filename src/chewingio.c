@@ -157,12 +157,11 @@ static ChewingData * allocate_ChewingData()
 	return data;
 }
 
-CHEWING_API ChewingContext *chewing_new()
-{
-	return chewing_new_IM("");
-}
-
+#ifdef SUPPORT_MULTI_IM
 CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
+#else
+static ChewingContext *chewing_new_IM( const char *IM_name )
+#endif
 {
 	ChewingContext *ctx;
 	int ret;
@@ -239,6 +238,11 @@ CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
 error:
 	chewing_delete( ctx );
 	return NULL;
+}
+
+CHEWING_API ChewingContext *chewing_new()
+{
+	return chewing_new_IM("");
 }
 
 CHEWING_API int chewing_Init(
@@ -1445,6 +1449,7 @@ CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	ctx->data->loggerData = data;
 }
 
+#ifdef SUPPORT_MULTI_IM
 CHEWING_API char *chewing_get_IM( ChewingContext *ctx, char *buffer, size_t buf_size )
 {
 	size_t out_len = strlen( ctx->data->static_data.IM_name )-1;
@@ -1485,3 +1490,4 @@ CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name )
 
 	return 1;
 }
+#endif
