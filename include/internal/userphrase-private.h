@@ -36,7 +36,7 @@
 struct tag_ChewingData;
 
 typedef struct tag_UserPhraseData {
-	uint16_t *phoneSeq;
+	KeySeqWord *phoneSeq;
 	char *wordSeq;
 	int userfreq;
 	int recentTime;
@@ -55,7 +55,7 @@ typedef struct tag_UserPhraseData {
  * @retval USER_UPDATE_INSERT Sequence is new, add new entry.
  * @retval USER_UPDATE_MODIFY Sequence is existing, update it's data.
  */
-int UserUpdatePhrase( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[], const char wordSeq[] );
+int UserUpdatePhrase( struct tag_ChewingData *pgdata, const KeySeqWord phoneSeq[], const char wordSeq[] );
 
 /**
  * @brief Read the first phrase of the phone in user phrase database.
@@ -64,7 +64,7 @@ int UserUpdatePhrase( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[],
  *
  * @return UserPhraseData, if it's not existing then return NULL.
  */
-UserPhraseData *UserGetPhraseFirst( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[] );
+UserPhraseData *UserGetPhraseFirst( struct tag_ChewingData *pgdata, const KeySeqWord phoneSeq[] );
 
 /**
  * @brief Read the next phrase of the phone in user phrase database.
@@ -73,6 +73,6 @@ UserPhraseData *UserGetPhraseFirst( struct tag_ChewingData *pgdata, const uint16
  *
  * @return UserPhraseData, if it's not existing then return NULL.
  */
-UserPhraseData *UserGetPhraseNext( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[] );
+UserPhraseData *UserGetPhraseNext( struct tag_ChewingData *pgdata, const KeySeqWord phoneSeq[] );
 
 #endif

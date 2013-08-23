@@ -20,7 +20,7 @@ void TerminateTree( ChewingData *pgdata );
 int Phrasing( ChewingData *pgdata );
 int IsIntersect( IntervalType in1, IntervalType in2 );
 
-const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const uint16_t *phoneSeq );
+const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const KeySeqWord *phoneSeq );
 void TreeChildRange( ChewingData *pgdata, const TreeType *parent );
 
 #endif

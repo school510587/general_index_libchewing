@@ -20,6 +20,7 @@
  *  \author libchewing Core Team
  */
 
+#include <stddef.h>
 #include "global.h"
 
 #define KEYSTROKE_IGNORE 1
@@ -178,6 +179,13 @@ CHEWING_API int chewing_handle_Numlock( ChewingContext *ctx, int key);
  * @see chewing_delete()
  */
 CHEWING_API ChewingContext *chewing_new();
+
+/**
+ * @brief Create new handle of the instance for Chewing IM in your IM name
+ * @param IM_name Name of your IM, default to Phonetic IM.
+ * @see chewing_delete()
+ */
+CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name );
 
 /**
  * @brief Release the handle and internal memory by given Chewing instance
@@ -537,7 +545,7 @@ CHEWING_API int chewing_get_phraseChoiceRearward( ChewingContext *ctx );
  *
  * @param ctx
  */
-CHEWING_API unsigned short *chewing_get_phoneSeq( ChewingContext *ctx );
+CHEWING_API KeySeqWord *chewing_get_phoneSeq( ChewingContext *ctx );
 
 /**
  * @brief Get the length of phonetic sequence in Chewing internal state machine
@@ -550,5 +558,21 @@ CHEWING_API int chewing_get_phoneSeqLen( ChewingContext *ctx );
 CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	void (*logger)( void *data, int level, const char *fmt, ... ),
 	void *data );
+
+/**
+ * @brief Get IM name from context.
+ * @param buffer Your buffer for result, NULL is ok.
+ * @param buf_size Size of your buffer, ignored when NULL buffer.
+ * @retval Your buffer when not NULL; memory from malloc() when NULL.
+ */
+CHEWING_API char *chewing_get_IM( ChewingContext *ctx, char *buffer, size_t buf_size );
+
+/**
+ * @brief IM switcher.
+ * @param ctx
+ * @param IM_name Destination of IM switch.
+ * @retval 1 on success; 0 on failure or the same destination as source in ctx.
+ */
+CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name );
 
 #endif /* _CHEWING_IO_H */

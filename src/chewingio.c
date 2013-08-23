@@ -76,6 +76,29 @@ const char * const PINYIN_FILES[] = {
 	NULL,
 };
 
+static int open_DICT_FILES( const char *IM_name, const char *search_path, char *path, size_t path_len )
+{
+	char **files;
+	int ret;
+
+	if( IM_name[0] ) {
+		files = (char**)malloc( ARRAY_SIZE(DICT_FILES)*sizeof(DICT_FILES[0]) );
+		assert( files );
+		files[0] = strdup( DICT_FILES[0] );
+		files[1] = (char*)malloc( strlen(IM_name)+strlen(DICT_FILES[1])+1 );
+		sprintf( files[1], "%s%s", IM_name, DICT_FILES[1] );
+	}
+	else files = DICT_FILES;
+	ret = find_path_by_files(
+		search_path, files, path, path_len );
+	if( IM_name[0] ) {
+		free( files[0] );
+		free( files[1] );
+		free( files );
+	}
+	return ret;
+}
+
 CHEWING_API int chewing_KBStr2Num( char str[] )
 {
 	int i;
@@ -136,10 +159,17 @@ static ChewingData * allocate_ChewingData()
 
 CHEWING_API ChewingContext *chewing_new()
 {
+	return chewing_new_IM("");
+}
+
+CHEWING_API ChewingContext *chewing_new_IM( const char *IM_name )
+{
 	ChewingContext *ctx;
 	int ret;
 	char search_path[PATH_MAX];
 	char path[PATH_MAX];
+
+	if( !IM_name ) IM_name = "";
 
 	ctx = ALC( ChewingContext, 1 );
 	if ( !ctx )
@@ -153,14 +183,19 @@ CHEWING_API ChewingContext *chewing_new()
 	if ( !ctx->data )
 		goto error;
 
+	ctx->data->static_data.IM_name = (char*)malloc( strlen(IM_name)+2 );
+	if( !ctx->data->static_data.IM_name )
+		goto error;
+	strcpy( ctx->data->static_data.IM_name, IM_name );
+	if( IM_name[0] ) strcat( ctx->data->static_data.IM_name, "_" );
+
 	chewing_Reset( ctx );
 
 	ret = get_search_path( search_path, sizeof( search_path ) );
 	if ( ret )
 		goto error;
 
-	ret = find_path_by_files(
-		search_path, DICT_FILES, path, sizeof( path ) );
+	ret = open_DICT_FILES( IM_name, search_path, path, sizeof(path) );
 	if ( ret )
 		goto error;
 	ret = InitDict( ctx->data, path );
@@ -285,6 +320,7 @@ CHEWING_API void chewing_delete( ChewingContext *ctx )
 			TerminateHash( ctx->data );
 			TerminateTree( ctx->data );
 			TerminateDict( ctx->data );
+			if( ctx->data->static_data.IM_name ) free( ctx->data->static_data.IM_name );
 			free( ctx->data );
 		}
 
@@ -1226,7 +1262,7 @@ CHEWING_API int chewing_handle_CtrlNum( ChewingContext *ctx, int key )
 	int keystrokeRtn = KEYSTROKE_ABSORB;
 	int newPhraseLen;
 	int i;
-	uint16_t addPhoneSeq[ MAX_PHONE_SEQ_LEN ];
+	KeySeqWord addPhoneSeq[ MAX_PHONE_SEQ_LEN ];
 	char addWordSeq[ MAX_PHONE_SEQ_LEN * MAX_UTF8_SIZE + 1 ];
 	int phraseState;
 	int cursor;
@@ -1261,7 +1297,7 @@ CHEWING_API int chewing_handle_CtrlNum( ChewingContext *ctx, int key )
 				/* Manually add phrase to the user phrase database. */
 				memcpy( addPhoneSeq,
 				        &pgdata->phoneSeq[ cursor ],
-				        sizeof( uint16_t ) * newPhraseLen );
+				        sizeof( KeySeqWord ) * newPhraseLen );
 				addPhoneSeq[ newPhraseLen ] = 0;
 				ueStrNCpy( addWordSeq,
 				           ueStrSeek( (char *) &pgdata->phrOut.chiBuf,
@@ -1292,7 +1328,7 @@ CHEWING_API int chewing_handle_CtrlNum( ChewingContext *ctx, int key )
 				/* Manually add phrase to the user phrase database. */
 				memcpy( addPhoneSeq,
 				        &pgdata->phoneSeq[ cursor - newPhraseLen ],
-				        sizeof( uint16_t ) * newPhraseLen );
+				        sizeof( KeySeqWord ) * newPhraseLen );
 				addPhoneSeq[ newPhraseLen ] = 0;
 				ueStrNCpy( addWordSeq,
 				           ueStrSeek( (char *) &pgdata->phrOut.chiBuf,
@@ -1383,12 +1419,12 @@ CHEWING_API int chewing_handle_Numlock( ChewingContext *ctx, int key )
 	return 0;
 }
 
-CHEWING_API unsigned short *chewing_get_phoneSeq( ChewingContext *ctx )
+CHEWING_API KeySeqWord *chewing_get_phoneSeq( ChewingContext *ctx )
 {
-	uint16_t *seq;
-	seq = ALC( uint16_t, ctx->data->nPhoneSeq );
+	KeySeqWord *seq;
+	seq = ALC( KeySeqWord, ctx->data->nPhoneSeq );
 	if ( seq )
-		memcpy( seq, ctx->data->phoneSeq, sizeof(uint16_t)*ctx->data->nPhoneSeq );
+		memcpy( seq, ctx->data->phoneSeq, sizeof(KeySeqWord)*ctx->data->nPhoneSeq );
 	return seq;
 }
 
@@ -1407,4 +1443,45 @@ CHEWING_API void chewing_set_logger( ChewingContext *ctx,
 	}
 	ctx->data->logger = logger;
 	ctx->data->loggerData = data;
+}
+
+CHEWING_API char *chewing_get_IM( ChewingContext *ctx, char *buffer, size_t buf_size )
+{
+	size_t out_len = strlen( ctx->data->static_data.IM_name )-1;
+
+	if( out_len == 0 ) out_len = strlen("Phonetic");
+	if( buffer && out_len >= buf_size ) out_len = buf_size-1;
+
+	if( !buffer ) buffer = (char*)malloc( out_len+1 );
+
+	strncpy( buffer, ctx->data->static_data.IM_name, out_len );
+	buffer[out_len] = '\0';
+
+	return buffer;
+}
+
+CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name )
+{
+	char search_path[PATH_MAX], path[PATH_MAX];
+	int ret;
+
+	if( !IM_name ) IM_name = "";
+	if( !strcmp(ctx->data->static_data.IM_name, IM_name) ) return 0;
+
+	TerminateTree( ctx->data );
+	if( ctx->data->static_data.IM_name ) free( ctx->data->static_data.IM_name);
+	ctx->data->static_data.IM_name = (char*)malloc( strlen(IM_name)+2 );
+	strcpy( ctx->data->static_data.IM_name, IM_name );
+	if( IM_name[0] ) strcat( ctx->data->static_data.IM_name, "_" );
+
+	ret = get_search_path( search_path, sizeof( search_path ) );
+	if( ret ) return 0;
+
+	ret = open_DICT_FILES( IM_name, search_path, path, sizeof(path) );
+	if( ret ) return 0;
+
+	ret = InitTree( ctx->data, path );
+	if( ret ) return 0;
+
+	return 1;
 }
