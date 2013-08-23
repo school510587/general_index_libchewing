@@ -1473,6 +1473,13 @@ CHEWING_API int switch_IM( ChewingContext *ctx, const char *IM_name )
 	if( !IM_name ) IM_name = "";
 	if( !strcmp(ctx->data->static_data.IM_name, IM_name) ) return 0;
 
+	/* It does not send selected range into hash. */
+	CheckAndResetRange( ctx->data );
+
+	/* Previously set buffer must be committed. */
+	do chewing_handle_Enter( ctx );
+	while( ctx->output->keystrokeRtn!=KEYSTROKE_IGNORE || ctx->output->keystrokeRtn!=KEYSTROKE_COMMIT );
+
 	TerminateTree( ctx->data );
 	if( ctx->data->static_data.IM_name ) free( ctx->data->static_data.IM_name);
 	ctx->data->static_data.IM_name = (char*)malloc( strlen(IM_name)+2 );
