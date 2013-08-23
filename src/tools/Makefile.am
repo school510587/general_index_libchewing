@@ -1,3 +1,5 @@
+SUBDIRS = ../../data
+
 INCLUDES = \
 	-I$(top_srcdir)/tools \
 	-I$(top_srcdir)/include \
@@ -9,7 +11,7 @@ INCLUDES = \
 CC = $(CC_FOR_BUILD)
 AM_CFLAGS = $(CFLAGS_FOR_BUILD)
 
-noinst_PROGRAMS = init_database
+noinst_PROGRAMS = init_database gen_IM_data
 
 init_database_SOURCES = \
 	init_database.c \
@@ -17,3 +19,17 @@ init_database_SOURCES = \
 	$(top_srcdir)/src/common/chewing-utf8-util.c \
 	$(top_srcdir)/src/common/key2pho.c \
 	$(NULL)
+
+gen_IM_data_SOURCES = \
+        gen_IM_data.c \
+        build_tool.c \
+        $(top_srcdir)/src/common/chewing-utf8-util.c \
+        $(top_srcdir)/src/common/key2pho.c \
+	$(top_srcdir)/src/porting_layer/src/plat_mmap_posix.c \
+	$(top_srcdir)/src/porting_layer/src/plat_mmap_windows.c \
+        $(NULL)
+
+all: $(noinst_PROGRAMS)
+	-mv -f gen_IM_data ../../data
+
+CLEANFILES = ../../data/gen_IM_data
