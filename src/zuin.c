@@ -666,9 +666,14 @@ static int NonZuinInput( ChewingData *pgdata, int key )
 		memset( pZuin->pho_inx_alt, 0, sizeof( pZuin->pho_inx_alt ) );
 		return ZUIN_COMMIT;
 	}
+
 	for(i = 0; i < ZUIN_SIZE && pZuin->pho_inx[i]; i++ );
-	pZuin->pho_inx[i] = key;
-	return 0;
+
+	if(i < ZUIN_SIZE) {
+		pZuin->pho_inx[i] = key;
+		return ZUIN_ABSORB;
+	}
+	return ZUIN_KEY_ERROR;
 }
 
 /* key: ascii code of input, including space */
