@@ -643,6 +643,29 @@ static int NonZuinInput( ChewingData *pgdata, int key )
 	ZuinData *pZuin = &(pgdata->zuinData);
 	int i;
 
+	/* Space is the default end key for non-zuin IM's. */
+	if( key == ' ' ) {
+		char buf[ZUIN_SIZE+1] = {0};
+		Phrase temp_word;
+		KeySeqWord keyin = 0;
+
+		/* Convert current key-in sequence into ASCII string. */
+		for(i = 0; i < ZUIN_SIZE; i++)
+			buf[i] = (char)pZuin->pho_inx[i];
+
+		keyin = EncodeKeyin( buf );
+		if ( GetCharFirst( pgdata, &temp_word, keyin ) == 0 ) {
+			ZuinRemoveAll( pZuin );
+			return ZUIN_NO_WORD;
+		}
+
+		pZuin->phone = keyin;
+		pZuin->phoneAlt = keyin;
+
+		memset( pZuin->pho_inx, 0, sizeof( pZuin->pho_inx ) );
+		memset( pZuin->pho_inx_alt, 0, sizeof( pZuin->pho_inx_alt ) );
+		return ZUIN_COMMIT;
+	}
 	for(i = 0; i < ZUIN_SIZE && pZuin->pho_inx[i]; i++ );
 	pZuin->pho_inx[i] = key;
 	return 0;
