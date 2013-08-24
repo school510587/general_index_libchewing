@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 	long dict_size, freq_size;
 	size_t offset=0, csize;
 	char IM_name[PATH_MAX];
-	const char *dict, *p;
+	const char *dict, *p, *prefix;
 	const int32_t *freq;
 	int cin_path_id, phr_id = 0;
 
@@ -136,35 +136,50 @@ int main(int argc, char *argv[])
 	read_IM_cin( argv[cin_path_id], IM_name, EncodeKeyin );
 
 	/* Go to data/, where the exe is. */
-	chdir(dirname( argv[0] ));
+	prefix = dirname( argv[0] );
+	if( chdir(prefix) != 0 ) {
+		fprintf(stderr, "Cannot enter directory `%s', aborted.\n", prefix);
+		return 1;
+	}
+	else printf("Entering directory `%s'\n", prefix);
 
+	printf("Opening system dictionary (%s)... ", DICT_FILE);
 	plat_mmap_set_invalid(&dict_map);
 	dict_size = plat_mmap_create(&dict_map, DICT_FILE, FLAG_ATTRIBUTE_READ);
 	csize = dict_size;
 	dict=(const char*)plat_mmap_set_view(&dict_map, &offset, &csize);
 
 	if( !dict ) {
+		putchar('\n');
 		fprintf(stderr, "%s: Error reading system dictionary.\n", argv[0]);
 		exit(-1);
 	}
+	puts("done.");
 
+	printf("Opening total frequency record (%s)... ", FREQ_FILE);
 	plat_mmap_set_invalid(&freq_map);
 	freq_size = plat_mmap_create(&freq_map, FREQ_FILE, FLAG_ATTRIBUTE_READ);
 	csize = freq_size;
 	freq = (const int32_t*)plat_mmap_set_view(&freq_map, &offset, &csize);
 
 	if( !freq ) {
+		putchar('\n');
 		fprintf(stderr, "%s: Error reading system frequency table.\n", argv[0]);
 		exit(-1);
 	}
+	puts("done.");
 
+	puts("Enumerating input methods for each phrase in system dictionary.");
 	for(p = dict; p < dict+dict_size; p++)
 		p = enumerate_keyin_sequence( p, freq[phr_id++] );
 
 	strcat(IM_name, "_" PHONE_TREE_FILE);
+	printf("Writing `%s', this is your index file.\n", IM_name);
 	write_index_tree( IM_name );
 
 	plat_mmap_close(&dict_map);
 	plat_mmap_close(&freq_map);
+
+	printf("Leaving directory `%s'\n", prefix);
 	return 0;
 }
