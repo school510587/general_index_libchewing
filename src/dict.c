@@ -85,7 +85,7 @@ int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phrase_parent_id )
 
 int GetPhraseNext( ChewingData *pgdata, Phrase *phr_ptr )
 {
-	if ( (unsigned char *)pgdata->static_data.dict_cur_pos >= (unsigned char *)pgdata->static_data.dict + pgdata->static_data.dict_end_pos )
+	if ( pgdata->static_data.tree_cur_pos >= pgdata->static_data.tree_end_pos )
 		return 0;
 
 	GetPhraseFromDict( pgdata, phr_ptr );
