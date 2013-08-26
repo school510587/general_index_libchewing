@@ -1,11 +1,7 @@
 tooldir = $(top_builddir)/src/tools
 datas = \
-	us_freq.dat \
 	dict.dat \
-	ph_index.dat \
 	fonetree.dat \
-	ch_index_begin.dat \
-	ch_index_phone.dat \
 	$(NULL)
 static_tables = pinyin.tab swkb.dat symbols.dat
 
