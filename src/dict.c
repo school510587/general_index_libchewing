@@ -55,7 +55,11 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 	return 0;
 }
 
-static void Str2Phrase( ChewingData *pgdata, Phrase *phr_ptr )
+/*
+ * The function gets string of phrase from dictionary and its frequency from
+ * tree index mmap, and stores them into buffer given by phr_ptr.
+ */
+static void GetPhraseFromDict( ChewingData *pgdata, Phrase *phr_ptr )
 {
 	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.tree_cur_pos ];
 
@@ -75,7 +79,7 @@ int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phrase_parent_id )
 
 	pgdata->static_data.tree_cur_pos = pgdata->static_data.tree[ phrase_parent_id ].child.begin;
 	pgdata->static_data.tree_end_pos = pgdata->static_data.tree[ phrase_parent_id ].child.end;
-	Str2Phrase( pgdata, phr_ptr );
+	GetPhraseFromDict( pgdata, phr_ptr );
 	return 1;
 }
 
@@ -83,6 +87,7 @@ int GetPhraseNext( ChewingData *pgdata, Phrase *phr_ptr )
 {
 	if ( (unsigned char *)pgdata->static_data.dict_cur_pos >= (unsigned char *)pgdata->static_data.dict + pgdata->static_data.dict_end_pos )
 		return 0;
-	Str2Phrase( pgdata, phr_ptr );
+
+	GetPhraseFromDict( pgdata, phr_ptr );
 	return 1;
 }
