@@ -1,5 +1,3 @@
-SUBDIRS = ../../data
-
 INCLUDES = \
 	-I$(top_srcdir)/tools \
 	-I$(top_srcdir)/include \
@@ -30,6 +28,6 @@ gen_IM_data_SOURCES = \
         $(NULL)
 
 all: $(noinst_PROGRAMS)
-	-mv -f gen_IM_data ../../data
+	-mv -f gen_IM_data $(top_builddir)/data
 
-CLEANFILES = ../../data/gen_IM_data
+CLEANFILES = $(top_builddir)/data/gen_IM_data
