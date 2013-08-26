@@ -67,12 +67,17 @@ static void Str2Phrase( ChewingData *pgdata, Phrase *phr_ptr )
 	phr_ptr->phrase[ size ] = '\0';
 }
 
-int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phone_phr_id )
+/*
+ * Given an index of parent whose children are phrase leaves (phrase_parent_id),
+ * the function initializes reading position (tree_cur_pos) and ending position
+ * (tree_end_pos), and fetches the first phrase into phr_ptr.
+ */
+int GetPhraseFirst( ChewingData *pgdata, Phrase *phr_ptr, int phrase_parent_id )
 {
-	assert( ( 0 <= phone_phr_id ) && ( phone_phr_id < PHONE_PHRASE_NUM ) );
+	assert( ( 0 <= phrase_parent_id ) && ( phrase_parent_id * sizeof(TreeType) < pgdata->static_data.tree_size ) );
 
-	pgdata->static_data.dict_cur_pos = (unsigned char *)pgdata->static_data.dict + pgdata->static_data.dict_begin[ phone_phr_id ];
-	pgdata->static_data.dict_end_pos = pgdata->static_data.dict_begin[ phone_phr_id + 1 ];
+	pgdata->static_data.tree_cur_pos = pgdata->static_data.tree[ phrase_parent_id ].child.begin;
+	pgdata->static_data.tree_end_pos = pgdata->static_data.tree[ phrase_parent_id ].child.end;
 	Str2Phrase( pgdata, phr_ptr );
 	return 1;
 }
