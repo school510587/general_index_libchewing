@@ -489,6 +489,7 @@ void write_index_tree()
 	/* (Circular) queue implementation is hidden within this function. */
 	NODE **queue, *p, *pNext;
 	int head=0, tail=0, tree_size=1;
+	size_t q_len = num_word_data + num_phrase_data;
 
 	FILE *output = fopen(PHONE_TREE_FILE, "wb");
 
@@ -497,13 +498,13 @@ void write_index_tree()
 		exit( 1 );
 	}
 
-	queue = ALC(NODE*, num_phrase_data+1);
+	queue = ALC(NODE*, q_len+1);
 	assert( queue );
 
 	queue[head++]=root;
 	while(head!=tail){
 		p = queue[tail++];
-		if(tail >= num_phrase_data) tail = 0;
+		if(tail >= q_len) tail = 0;
 		if(p->data.key != 0)
 		{
 			p->data.child.begin = tree_size;
@@ -515,14 +516,14 @@ void write_index_tree()
 			 * them.
 			 */
 			if(head == 0)
-				queue[num_phrase_data-1]->pNextSibling = p->pFirstChild;
+				queue[q_len-1]->pNextSibling = p->pFirstChild;
 			else
 				queue[head-1]->pNextSibling = p->pFirstChild;
 
 			for(pNext=p->pFirstChild; pNext!=NULL; pNext=pNext->pNextSibling)
 			{
 				queue[head++]=pNext;
-				if(head == num_phrase_data) head = 0;
+				if(head == q_len) head = 0;
 				tree_size++;
 			}
 
