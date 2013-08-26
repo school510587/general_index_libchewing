@@ -29,6 +29,38 @@
 
 #define CIN_EXTENSION ".cin"
 
+/* Setting flag for warnings. */
+static int show_warning = 0;
+
+/**
+ * @brief Scan and configuration by arguments.
+ * @retval Index to the path of cin file. On failure, it returns -1.
+ */
+int scan_arguments( int argc, char* argv[] )
+{
+	int cin_path_id = -1, i;
+	size_t l;
+
+	for(i = 1; i < argc; i++) {
+		l = strlen( argv[i] );
+		if( !strcmp( argv[i], "-w") || !strcmp( argv[i], "--show-warning") )
+			show_warning = 1;
+		else if( l>4 && !strcmp( &argv[i][l-4], CIN_EXTENSION ) ) {
+			if( cin_path_id < 0 ) cin_path_id = i;
+			else {
+				fprintf(stderr, "%s: Multiple cin specifications, stop.\n", argv[0]);
+				exit(-1);
+			}
+		}
+		else {
+			fprintf(stderr, "%s: Unrecognized option `%s', stop.\n", argv[0], argv[i]);
+			exit(-1);
+		}
+	}
+
+	return cin_path_id;
+}
+
 /* Compare words by string only. */
 int compare_word_by_str(const void *x, const void *y)
 {
@@ -91,7 +123,8 @@ const char *enumerate_keyin_sequence(const char *phrase, int32_t total_freq)
 			p += ueBytesFromChar(*p);
 		}
 		else {
-			fprintf(stderr, "Warning: `%s' cannot be input from cin.\n", phrase);
+			if( show_warning )
+				fprintf(stderr, "Warning: `%s' cannot be input from cin.\n", phrase);
 			while( *p ) p++;
 			return p;
 		}
@@ -123,12 +156,8 @@ int main(int argc, char *argv[])
 	const int32_t *freq;
 	int cin_path_id, phr_id = 0;
 
-	for(cin_path_id = 1; cin_path_id < argc; cin_path_id++){
-		size_t l = strlen( argv[cin_path_id] );
-		if(l>4 && !strcmp( &argv[cin_path_id][l-4], CIN_EXTENSION) ) break;
-	}
-
-	if( cin_path_id >= argc) {
+	cin_path_id = scan_arguments( argc, argv );
+	if( cin_path_id < 0 ) {
 		fprintf(stderr, "Usage: %s <cin_filename>\n", argv[0]);
 		exit(-1);
 	}
