@@ -173,15 +173,11 @@ typedef struct {
 	plat_mmap char_begin_mmap;
 	plat_mmap char_phone_mmap;
 
-	int *dict_begin;
 	void *dict_cur_pos;
 	int dict_end_pos;
 
 	void *dict;
-
 	plat_mmap dict_mmap;
-	plat_mmap index_mmap;
-
 
 	int chewing_lifetime;
 

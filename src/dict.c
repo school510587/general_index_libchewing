@@ -26,7 +26,6 @@
 
 void TerminateDict( ChewingData *pgdata )
 {
-	plat_mmap_close( &pgdata->static_data.index_mmap );
 	plat_mmap_close( &pgdata->static_data.dict_mmap );
 }
 
@@ -51,21 +50,6 @@ int InitDict( ChewingData *pgdata, const char *prefix )
 	csize = file_size;
 	pgdata->static_data.dict = plat_mmap_set_view( &pgdata->static_data.dict_mmap, &offset, &csize );
 	if ( !pgdata->static_data.dict )
-		return -1;
-
-	len = snprintf( filename, sizeof( filename ), "%s" PLAT_SEPARATOR "%s", prefix, PH_INDEX_FILE );
-	if ( len + 1 > sizeof( filename ) )
-		return -1;
-
-	plat_mmap_set_invalid( &pgdata->static_data.index_mmap );
-	file_size = plat_mmap_create( &pgdata->static_data.index_mmap, filename, FLAG_ATTRIBUTE_READ );
-	if ( file_size <= 0 )
-		return -1;
-
-	offset = 0;
-	csize = file_size;
-	pgdata->static_data.dict_begin = plat_mmap_set_view( &pgdata->static_data.index_mmap, &offset, &csize );
-	if ( !pgdata->static_data.dict_begin )
 		return -1;
 
 	return 0;
