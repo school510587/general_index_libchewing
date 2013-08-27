@@ -27,7 +27,6 @@
 #include "global.h"
 #include "global-private.h"
 #include "dict-private.h"
-#include "char-private.h"
 #include "tree-private.h"
 #include "private.h"
 #include "plat_mmap.h"
