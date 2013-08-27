@@ -41,7 +41,7 @@ static int LoadOriginalFreq( ChewingData *pgdata, const uint16_t phoneSeq[], con
 				free( phrase );
 				return retval;
 			}
-		} while ( GetPhraseNext( pgdata, phrase ) );
+		} while ( GetVocabNext( pgdata, phrase ) );
 	}
 
 	free( phrase );
@@ -62,7 +62,7 @@ static int LoadMaxFreq( ChewingData *pgdata, const uint16_t phoneSeq[], int len 
 		do {
 			if ( phrase->freq > maxFreq )
 				maxFreq = phrase->freq;
-		} while( GetPhraseNext( pgdata, phrase ) );
+		} while( GetVocabNext( pgdata, phrase ) );
 	}
 	free( phrase );
 
