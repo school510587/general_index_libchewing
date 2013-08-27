@@ -39,14 +39,16 @@ int InitChar( ChewingData *pgdata , const char * prefix )
 	return 0;
 }
 
+/*
+ * The function gets string of a Chinese character from dictionary, and stores
+ * it into buffer given by wrd_ptr.
+ */
 static void Str2Word( ChewingData *pgdata, Word *wrd_ptr )
 {
-	unsigned char size;
-	size = *(unsigned char *) pgdata->static_data.char_cur_pos;
-	pgdata->static_data.char_cur_pos = (unsigned char*) pgdata->static_data.char_cur_pos + sizeof(unsigned char);
-	memcpy( wrd_ptr->word, pgdata->static_data.char_cur_pos, size );
-	pgdata->static_data.char_cur_pos = (unsigned char*) pgdata->static_data.char_cur_pos + size;
-	wrd_ptr->word[ size ] = '\0';
+	const TreeType *pLeaf = &pgdata->static_data.tree[ pgdata->static_data.char_cur_pos ];
+
+	strcpy(wrd_ptr->word, pgdata->static_data.dict + pLeaf->phrase.pos);
+	pgdata->static_data.char_cur_pos++;
 }
 
 int GetCharFirst( ChewingData *pgdata, Word *wrd_ptr, uint16_t phoneid )
