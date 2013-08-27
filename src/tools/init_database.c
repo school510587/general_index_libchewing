@@ -57,11 +57,6 @@ const char USAGE[] =
 	"* " DICT_FILE "\n\tmain phrase file\n"
 ;
 
-typedef struct {
-	uint16_t phone;
-	char word[MAX_UTF8_SIZE + 1];
-} WordData;
-
 /* An additional pos helps avoid duplicate Chinese strings. */
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
@@ -69,6 +64,11 @@ typedef struct {
 	uint16_t phone[MAX_PHRASE_LEN + 1];
 	long pos;
 } PhraseData;
+
+typedef struct {
+	PhraseData text; // Common part shared with PhraseData. */
+	int index; /* For stable sorting. */
+} WordData;
 
 /*
  * Please see TreeType for data field. pFirstChild points to the first of its
@@ -111,18 +111,31 @@ void strip(char *line)
 	}
 }
 
-int compare_word(const void *x, const void *y)
+/* word_data is sorted reversely, for stack-like push operation. */
+int compare_word_by_phone(const void *x, const void *y)
+{
+	const WordData *a = (const WordData *)x;
+	const WordData *b = (const WordData *)y;
+
+	if (a->text.phone[0] != b->text.phone[0])
+		return b->text.phone[0] - a->text.phone[0];
+
+	/* Compare original index for stable sort */
+	return b->index - a->index;
+}
+
+int compare_word_by_text(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
 	int ret;
 
-	ret = strcmp(a->word, b->word);
+	ret = strcmp(a->text.phrase, b->text.phrase);
 	if (ret != 0)
 		return ret;
 
-	if (a->phone != b->phone)
-		return a->phone - b->phone;
+	if (a->text.phone[0] != b->text.phone[0])
+		return a->text.phone[0] - b->text.phone[0];
 
 	return 0;
 }
@@ -205,7 +218,7 @@ void store_phrase(const char *line, int line_num)
 	}
 #endif
 
-	++num_phrase_data;
+	if(phrase_len >= 2) ++num_phrase_data;
 }
 
 int compare_phrase(const void *x, const void *y)
@@ -269,20 +282,16 @@ void store_word(const char *line, const int line_num)
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].word);
+		key_buf, word_data[num_word_data].text.phrase);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].phone = UintFromPhone(phone_buf);
+	word_data[num_word_data].text.phone[0] = UintFromPhone(phone_buf);
 
-	/* FIXME
-	 * Here, check if the word with this phone exists in phrase dictionary.
-	 * If it is guaranteed that each word exists in phrase dictionary with
-	 * phones listed in phone.cin, the step can be ignored.
-	 */
+	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
 }
 
@@ -343,6 +352,8 @@ void read_phone_cin(const char *filename)
 			store_word(buf, line_num);
 	}
 	fclose(phone_cin);
+
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_text);
 }
 
 NODE *new_node( uint32_t key )
@@ -388,6 +399,7 @@ void insert_leaf(NODE *parent, long phr_pos, int freq)
 
 	for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
 		if(p->data.phrase.freq <= freq) break;
+
 	pnew = new_node(0);
 	pnew->data.phrase.pos = (uint32_t)phr_pos;
 	pnew->data.phrase.freq = freq;
@@ -403,8 +415,26 @@ void construct_phrase_tree()
 	NODE *levelPtr;
 	int i, j;
 
+	/* First, assume that words are in order of their phones and indices. */
+	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_by_phone);
+
 	/* Key value of root will become tree_size later. */
 	root = new_node( 1 );
+
+	/* Second, insert word_data as the first level of children. */
+	for(i = 0; i < num_word_data; i++) {
+		if(i == 0 || word_data[i].text.phone[0] != word_data[i-1].text.phone[0]) {
+			levelPtr = new_node(word_data[i].text.phone[0]);
+			levelPtr->pNextSibling = root->pFirstChild;
+			root->pFirstChild = levelPtr;
+		}
+		levelPtr = new_node( 0 );
+		levelPtr->data.phrase.pos = (uint32_t)word_data[i].text.pos;
+		levelPtr->data.phrase.freq = word_data[i].text.freq;
+		levelPtr->pNextSibling = root->pFirstChild->pFirstChild;
+		root->pFirstChild->pFirstChild = levelPtr;
+	}
+
 	for(i = 0; i < num_phrase_data; ++i)
 	{
 		levelPtr=root;
@@ -417,7 +447,8 @@ void construct_phrase_tree()
 void write_phrase_data()
 {
 	FILE *dict_file;
-	int i;
+	PhraseData *cur_phr, *last_phr;
+	int i, j;
 
 	dict_file = fopen(DICT_FILE, "wb");
 
@@ -431,13 +462,16 @@ void write_phrase_data()
 	 * dictionary. Written phrases are separated by '\0', for convenience of
 	 * mmap usage.
 	 */
-	for (i = 0; i < num_phrase_data; ++i)
-	{
-		if(i>0 && !strcmp(phrase_data[i].phrase, phrase_data[i-1].phrase))
-			phrase_data[i].pos = phrase_data[i-1].pos;
+	for(i = j = 0; i < num_word_data || j < num_phrase_data; last_phr = cur_phr){
+		if(i == num_word_data) cur_phr = &phrase_data[j++];
+		else if(j == num_phrase_data) cur_phr = &word_data[i++].text;
+		else cur_phr = strcmp(word_data[i].text.phrase, phrase_data[j].phrase)<0 ? &word_data[i++].text : &phrase_data[j++];
+
+		if(last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
+			cur_phr->pos = last_phr->pos;
 		else {
-			phrase_data[i].pos=ftell(dict_file);
-			fwrite(phrase_data[i].phrase, (strlen(phrase_data[i].phrase)+1), 1, dict_file);
+			cur_phr->pos = ftell(dict_file);
+			fwrite(cur_phr->phrase, strlen(cur_phr->phrase)+1, 1, dict_file);
 		}
 	}
 
