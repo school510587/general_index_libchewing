@@ -204,19 +204,19 @@ void store_phrase(const char *line, int line_num)
 		exit(-1);
 	}
 
-	/* Please delete this #if after resoving exception phrase cases. It causes some unused variables. */
-#if 0
 	/* Check that each word in phrase can be found in word list. */
 	for (i = 0; i < phrase_len; ++i) {
 		ueStrNCpy(word.text.phrase, ueStrSeek(phrase_data[num_phrase_data].phrase, i), 1, 1);
 		word.text.phone[0] = phrase_data[num_phrase_data].phone[i];
 		if (bsearch(&word, word_data, num_word_data, sizeof(word), compare_word_by_text) == NULL) {
+		        /* Please delete this #if after resoving exception phrase cases. */
+#if 0
 			PhoneFromUint(bopomofo_buf, sizeof(bopomofo_buf), word.text.phone[0]);
 			fprintf(stderr, "Phrase:%d:error:`%s': `%s' has no phone `%s'\n", line_num, phrase_data[num_phrase_data].phrase, word.text.phrase, bopomofo_buf);
 			exit(-1);
+#endif
 		}
 	}
-#endif
 
 	if (phrase_len >= 2)
 		++num_phrase_data;
