@@ -218,26 +218,26 @@ void store_phrase(const char *line, int line_num)
 	}
 #endif
 
-	if(phrase_len >= 2) ++num_phrase_data;
+	if (phrase_len >= 2)
+		++num_phrase_data;
 }
 
 int compare_phrase(const void *x, const void *y)
 {
 	const PhraseData *a = (const PhraseData *) x, *b = (const PhraseData *) y;
-	int cmp=strcmp(a->phrase, b->phrase);
+	int cmp = strcmp(a->phrase, b->phrase);
 
 	/* If phrases are different, it returns the result of strcmp(); else it
 	 * reports an error when the same phone sequence is found.
 	 */
 	if (cmp) return cmp;
-	else
-	{
-		if(!memcmp(a->phone, b->phone, sizeof(a->phone)))
-		{
+	else {
+		if (!memcmp(a->phone, b->phone, sizeof(a->phone))) {
 			fprintf(stderr, "Duplicated phrase `%s' found.\n", a->phrase);
 			exit(-1);
 		}
-		else return b->freq - a->freq;
+		else
+			return b->freq - a->freq;
 	}
 }
 
@@ -309,8 +309,7 @@ void read_phone_cin(const char *filename)
 		exit(-1);
 	}
 
-	for(status=INIT; status!=HAS_CHARDEF_END; )
-	{
+	for (status = INIT; status != HAS_CHARDEF_END; ) {
 		ret = fgets(buf, sizeof(buf), phone_cin);
 		++line_num;
 		if (!ret) {
@@ -319,24 +318,22 @@ void read_phone_cin(const char *filename)
 		}
 
 		strip( buf );
-		if( buf[0]=='%') {
+		if (buf[0] == '%') {
 			ret = strtok(buf, " \t");
-			if(!strcmp(ret, CHARDEF))
-			{
+			if (!strcmp(ret, CHARDEF)) {
 				ret = strtok(NULL, " \t");
-				switch(status)
-				{
+				switch (status) {
 					case INIT:
-						if(!strcmp(ret, BEGIN))
-							status=HAS_CHARDEF_BEGIN;
+						if (!strcmp(ret, BEGIN))
+							status = HAS_CHARDEF_BEGIN;
 						else {
 							fprintf(stderr, "%s %s is expected.\n", CHARDEF, BEGIN);
 							exit(-1);
 						}
 					break;
 					case HAS_CHARDEF_BEGIN:
-						if(!strcmp(ret, END))
-							status=HAS_CHARDEF_END;
+						if (!strcmp(ret, END))
+							status = HAS_CHARDEF_END;
 						else {
 							fprintf(stderr, "%s %s is expected.\n", CHARDEF, END);
 							exit(-1);
@@ -348,7 +345,7 @@ void read_phone_cin(const char *filename)
 				}
 			}
 		}
-		else if(status == HAS_CHARDEF_BEGIN)
+		else if (status == HAS_CHARDEF_BEGIN)
 			store_word(buf, line_num);
 	}
 	fclose(phone_cin);
@@ -360,7 +357,7 @@ NODE *new_node( uint32_t key )
 {
 	NODE *pnew = ALC(NODE, 1);
 
-	if(pnew == NULL){
+	if (pnew == NULL) {
 		fprintf(stderr, "Memory allocation failed on constructing phrase tree.\n");
 		exit(-1);
 	}
@@ -381,11 +378,13 @@ NODE *find_or_insert(NODE *parent, uint32_t key)
 {
 	NODE *prev=NULL, *p, *pnew;
 
-	for(p=parent->pFirstChild; p!=NULL && p->data.key <= key; prev = p, p = p->pNextSibling)
-		if(p->data.key == key) return p;
+	for (p = parent->pFirstChild; p && p->data.key <= key; prev = p, p = p->pNextSibling)
+		if (p->data.key == key)
+			return p;
+
 	pnew = new_node( key );
 	pnew->pNextSibling = p;
-	if(prev == NULL)
+	if (prev == NULL)
 		parent->pFirstChild = pnew;
 	else
 		prev->pNextSibling = pnew;
@@ -397,13 +396,14 @@ void insert_leaf(NODE *parent, long phr_pos, int freq)
 {
 	NODE *prev=NULL, *p, *pnew;
 
-	for(p=parent->pFirstChild; p!=NULL && p->data.key == 0; prev = p, p = p->pNextSibling)
-		if(p->data.phrase.freq <= freq) break;
+	for (p = parent->pFirstChild; p && p->data.key == 0; prev = p, p = p->pNextSibling)
+		if (p->data.phrase.freq <= freq)
+			break;
 
 	pnew = new_node(0);
 	pnew->data.phrase.pos = (uint32_t)phr_pos;
 	pnew->data.phrase.freq = freq;
-	if(prev == NULL)
+	if (prev == NULL)
 		parent->pFirstChild = pnew;
 	else
 		prev->pNextSibling = pnew;
@@ -422,8 +422,8 @@ void construct_phrase_tree()
 	root = new_node( 1 );
 
 	/* Second, insert word_data as the first level of children. */
-	for(i = 0; i < num_word_data; i++) {
-		if(i == 0 || word_data[i].text.phone[0] != word_data[i-1].text.phone[0]) {
+	for (i = 0; i < num_word_data; i++) {
+		if (i == 0 || word_data[i].text.phone[0] != word_data[i-1].text.phone[0]) {
 			levelPtr = new_node(word_data[i].text.phone[0]);
 			levelPtr->pNextSibling = root->pFirstChild;
 			root->pFirstChild = levelPtr;
@@ -436,11 +436,10 @@ void construct_phrase_tree()
 	}
 
 	/* Third, insert phrases having length at least 2. */
-	for(i = 0; i < num_phrase_data; ++i)
-	{
-		levelPtr=root;
-		for(j=0; phrase_data[i].phone[j]!=0; ++j)
-			levelPtr=find_or_insert(levelPtr, phrase_data[i].phone[j]);
+	for (i = 0; i < num_phrase_data; ++i) {
+		levelPtr = root;
+		for (j = 0; phrase_data[i].phone[j] != 0; ++j)
+			levelPtr = find_or_insert(levelPtr, phrase_data[i].phone[j]);
 		insert_leaf(levelPtr, phrase_data[i].pos, phrase_data[i].freq);
 	}
 }
@@ -463,12 +462,17 @@ void write_phrase_data()
 	 * dictionary. Written phrases are separated by '\0', for convenience of
 	 * mmap usage.
 	 */
-	for(i = j = 0; i < num_word_data || j < num_phrase_data; last_phr = cur_phr){
-		if(i == num_word_data) cur_phr = &phrase_data[j++];
-		else if(j == num_phrase_data) cur_phr = &word_data[i++].text;
-		else cur_phr = strcmp(word_data[i].text.phrase, phrase_data[j].phrase)<0 ? &word_data[i++].text : &phrase_data[j++];
+	for (i = j = 0; i < num_word_data || j < num_phrase_data; last_phr = cur_phr) {
+		if (i == num_word_data)
+			cur_phr = &phrase_data[j++];
+		else if (j == num_phrase_data)
+			cur_phr = &word_data[i++].text;
+		else
+			cur_phr = strcmp(word_data[i].text.phrase, phrase_data[j].phrase)<0
+				? &word_data[i++].text
+				: &phrase_data[j++];
 
-		if(last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
+		if (last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
 			cur_phr->pos = last_phr->pos;
 		else {
 			cur_phr->pos = ftell(dict_file);
@@ -501,11 +505,11 @@ void write_index_tree()
 	assert( queue );
 
 	queue[head++]=root;
-	while(head!=tail){
+	while (head != tail) {
 		p = queue[tail++];
-		if(tail >= num_phrase_data) tail = 0;
-		if(p->data.key != 0)
-		{
+		if (tail >= num_phrase_data)
+			tail = 0;
+		if (p->data.key != 0) {
 			p->data.child.begin = tree_size;
 
 			/*
@@ -514,15 +518,15 @@ void write_index_tree()
 			 * it point to the next child list to serialize
 			 * them.
 			 */
-			if(head == 0)
+			if (head == 0)
 				queue[num_phrase_data-1]->pNextSibling = p->pFirstChild;
 			else
 				queue[head-1]->pNextSibling = p->pFirstChild;
 
-			for(pNext=p->pFirstChild; pNext!=NULL; pNext=pNext->pNextSibling)
-			{
-				queue[head++]=pNext;
-				if(head == num_phrase_data) head = 0;
+			for (pNext = p->pFirstChild; pNext; pNext = pNext->pNextSibling) {
+				queue[head++] = pNext;
+				if (head == num_phrase_data)
+					head = 0;
 				tree_size++;
 			}
 
@@ -531,8 +535,7 @@ void write_index_tree()
 	}
 	root->data.key = tree_size;
 
-	for(p=root; p!=NULL; p=pNext)
-	{
+	for (p = root; p; p = pNext) {
 		fwrite(&p->data, sizeof(TreeType), 1, output);
 		pNext = p->pNextSibling;
 		free(p);
