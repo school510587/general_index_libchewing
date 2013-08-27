@@ -170,9 +170,6 @@ typedef struct {
 	void *char_;
 	void *char_cur_pos;
 	int char_end_pos;
-	plat_mmap char_mmap;
-	plat_mmap char_begin_mmap;
-	plat_mmap char_phone_mmap;
 
 	const char *dict;
 	plat_mmap dict_mmap;
