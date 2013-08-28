@@ -102,6 +102,24 @@ AC_ARG_ENABLE([gcov],
               [ENABLE_GCOV="false"])
 AS_IF([test x$ENABLE_GCOV = x"true"], [AM_CFLAGS="$AM_CFLAGS --coverage"])
 
+dnl allow index trees multiple IMs
+AC_ARG_ENABLE([multiple-IM],
+                [AS_HELP_STRING([--enable-multiple-IM],
+                                [Experimental use of index trees of multiple IMs @<:@default=no@:>@])],
+                [case "${enableval}" in
+                yes)
+                multiple_IM="yes"
+                ;;
+                *)
+                multiple_IM="no"
+                ;;
+                esac],multiple_IM="no")
+if test x$multiple_IM = "xyes"; then
+        AC_DEFINE(SUPPORT_MULTI_IM, 1, [Experimental use of index trees of multiple IMs])
+fi
+AC_SUBST(ENABLE_MULTI_IM)
+AM_CONDITIONAL(ENABLE_MULTI_IM, test x$multiple_IM = "xyes")
+
 dnl Adds -fvisibility=hidden to CFLAGS if running with gcc 4 or greater.
 AC_MSG_CHECKING([whether the compiler supports GCC Visibility])
 dnl Check for gcc4 or greater
