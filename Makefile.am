@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = src/tools src test doc
+SUBDIRS = src/tools data src test doc
 
 CMAKE_FILES = \
 	cmake/chewing.pc.in \
