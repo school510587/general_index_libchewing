@@ -203,8 +203,10 @@ void write_phrase_data()
 		else {
 			cur_phr->pos = ftell(dict_file);
 			fwrite(cur_phr->phrase, strlen(cur_phr->phrase)+1, 1, dict_file);
-			if( last_phr )
+			if( last_phr ){
 				fwrite(&total_freq, 1, sizeof(total_freq), freq_file);
+				total_freq = cur_phr->freq;
+			}
 		}
 	}
 	/* The last unwritten total_freq. */
