@@ -86,7 +86,7 @@ static int open_DICT_FILES( const char *IM_name, const char *search_path, char *
 		assert( files );
 		files[0] = strdup( DICT_FILES[0] );
 		files[1] = (char*)malloc( strlen(IM_name)+strlen(DICT_FILES[1])+1 );
-		sprintf( files[1], "%s%s", IM_name, DICT_FILES[1] );
+		sprintf( files[1], "%s_%s", IM_name, DICT_FILES[1] );
 	}
 	else files = DICT_FILES;
 	ret = find_path_by_files(
