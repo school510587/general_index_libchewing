@@ -99,28 +99,30 @@ void find_keyin_sequence(const IntervalType range[], uint32_t keyin_buf[], int w
  * IntervalType is used to handle this circumstance. The return value indicates
  * position of '\0', satisfying the least access to the mmap for dictionary.
  */
-const char *enumerate_keyin_sequence(const char *phrase, int32_t total_freq)
+const char *enumerate_keyin_sequence(const char *phrase, long phr_pos, int32_t total_freq)
 {
 	IntervalType range[MAX_PHRASE_LEN + 1] = {0};
 	uint32_t keyin_buf[MAX_PHRASE_LEN + 1] = {0};
 	const char *p = phrase;
 	WordData tmpWord, *q, *r;
-	int old_num_phrase_data = num_phrase_data, i;
+	int old_num_phrase_data = num_phrase_data, b, i;
 
 	/* Null phrases are rejected. */
 	if( *p == '\0') return p;
 
 	/* Set up range of each word in word_data. */
 	for(i = 0; *p; i++) {
-		memcpy( tmpWord.text.phrase, p, ueBytesFromChar(*p) );
+		b = ueBytesFromChar(*p);
+		memcpy(tmpWord.text.phrase, p, b);
+		tmpWord.text.phrase[b] = '\0';
 		q = (WordData*)bsearch(&tmpWord, word_data, num_word_data,
 			sizeof(tmpWord), compare_word_by_str);
 		if( q ) {
-			for(r = q; r > word_data && !strcmp(r->text.phrase, (r-1)->text.phrase); r--);
-			range[i].from = r-word_data;
-			for(r = q+1; r < word_data+num_word_data && !strcmp(r->text.phrase, (r-1)->text.phrase); r++);
+			for (r = q - 1; r >= word_data && !strcmp(r->text.phrase, q->text.phrase); r--);
+			range[i].from = (r - word_data) + 1;
+			for (r = q + 1; r < word_data + num_word_data && !strcmp(r->text.phrase, q->text.phrase); r++);
 			range[i].to = r-word_data;
-			p += ueBytesFromChar(*p);
+			p += b;
 		}
 		else {
 			if( show_warning )
@@ -130,9 +132,12 @@ const char *enumerate_keyin_sequence(const char *phrase, int32_t total_freq)
 		}
 	}
 	/* Length-one phrases. */
-	if( range[1].from == range[1].to )
-		for(i = range[0].from; i < range[0].to; i++)
+	if (range[1].from == range[1].to) {
+		for (i = range[0].from; i < range[0].to; i++) {
+			word_data[i].text.pos = phr_pos;
 			word_data[i].text.freq = CEIL_DIV(total_freq, range[0].to - range[0].from);
+		}
+	}
 	else {
 		/* Note: 0 means the first (0th) word is referenced. */
 		find_keyin_sequence( range, keyin_buf, 0);
@@ -140,6 +145,7 @@ const char *enumerate_keyin_sequence(const char *phrase, int32_t total_freq)
 		/* Set all data in phrase_data. */
 		for( i = old_num_phrase_data; i < num_phrase_data; i++) {
 			strcpy(phrase_data[i].phrase, phrase);
+			phrase_data[i].pos = phr_pos;
 			phrase_data[i].freq = CEIL_DIV(total_freq, num_phrase_data - old_num_phrase_data);
 		}
 	}
@@ -200,7 +206,7 @@ int main(int argc, char *argv[])
 
 	puts("Enumerating input methods for each phrase in system dictionary.");
 	for(p = dict; p < dict+dict_size; p++)
-		p = enumerate_keyin_sequence( p, freq[phr_id++] );
+		p = enumerate_keyin_sequence(p, p - dict, freq[phr_id++]);
 
 	strcat(IM_name, "_" PHONE_TREE_FILE);
 	printf("Writing `%s', this is your index file.\n", IM_name);
