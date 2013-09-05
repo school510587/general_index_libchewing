@@ -175,7 +175,7 @@ void read_tsi_src(const char *filename)
 void write_phrase_data()
 {
 	FILE *dict_file, *freq_file;
-	PhraseData *cur_phr, *last_phr;
+	PhraseData *cur_phr, *last_phr = NULL;
 	int32_t total_freq = 0, i, j;
 
 	dict_file = fopen(DICT_FILE, "wb");
