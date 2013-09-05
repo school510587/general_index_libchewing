@@ -70,12 +70,12 @@ start:
 	return linebuf[ idx++ ];
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	if ( ! init_sim() )
 		return 1;
 
-	chewing_test_Main();
+	chewing_test_Main(argc, argv);
 
 	{
 		printf(

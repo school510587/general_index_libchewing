@@ -80,9 +80,9 @@ void compare_per_run()
 }
 
 /* entry point for simulation */
-int chewing_test_Main()
+int chewing_test_Main(int argc, char *argv[])
 #else
-int main()
+int main(int argc, char *argv[])
 #endif
 {
 	ChewingContext *ctx;
@@ -94,7 +94,11 @@ int main()
 	putenv( "CHEWING_USER_PATH=" TEST_HASH_DIR );
 
 	/* Request handle to ChewingContext */
+#ifdef SUPPORT_MULTI_IM
+	ctx = chewing_new_IM(argv[1]);
+#else
 	ctx = chewing_new();
+#endif
 
 	/* Set keyboard type */
 	chewing_set_KBType( ctx, chewing_KBStr2Num( "KB_DEFAULT" ) );
