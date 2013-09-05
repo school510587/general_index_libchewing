@@ -256,7 +256,7 @@ const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const K
 	for ( i = begin; i <= end; i++ ) {
 		target.key = phoneSeq[i];
 		tree_p = (const TreeType*)bsearch(&target, pgdata->static_data.tree + tree_p->child.begin, 
-						  tree_p->child.end - tree_p->child.begin +1, sizeof(TreeType), CompTreeType);
+						  tree_p->child.end - tree_p->child.begin, sizeof(TreeType), CompTreeType);
 
 		/* if not found any word then fail. */
 		if( !tree_p ) return NULL;
