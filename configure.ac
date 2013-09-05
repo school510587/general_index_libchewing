@@ -108,6 +108,8 @@ AC_ARG_ENABLE([multi-IM],
               [AS_CASE([${enableval}], [yes], [ENABLE_MULTI_IM="true"], [ENABLE_MULTI_IM="false"])],
               [ENABLE_MULTI_IM="false"])
 AS_IF([test x$ENABLE_MULTI_IM = x"true"], [AM_CFLAGS="$AM_CFLAGS -DSUPPORT_MULTI_IM"])
+AC_SUBST(MULTI_IM)
+AM_CONDITIONAL(MULTI_IM, test x$ENABLE_MULTI_IM = "xtrue")
 
 dnl Adds -fvisibility=hidden to CFLAGS if running with gcc 4 or greater.
 AC_MSG_CHECKING([whether the compiler supports GCC Visibility])
