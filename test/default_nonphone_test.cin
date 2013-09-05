@@ -1,0 +1,30 @@
+%gen_inp
+%ename demo_inp
+%cname 非注音輸入法示範
+%keep_key_case
+%chardef begin
+3@ 我
+3@ 婐
+3@ 捰
+ru@ 很
+ru@ 狠
+e*@ 洗
+e*@ 喜
+e*@ 璽
+e*@ 囍
+r}' 歡
+r}' 獾
+r}' 酄
+e?' 新
+e?' 心
+e?' 馨
+e?' 薪
+e?' 欣
+l/" 庫
+l/" 酷
+l/" 褲
+?' 因
+?' 音
+?' 陰
+?' 殷
+%chardef end
