@@ -66,7 +66,7 @@ typedef struct {
 } PhraseData;
 
 typedef struct {
-	PhraseData text; // Common part shared with PhraseData. */
+	PhraseData *text; // Common part shared with PhraseData. */
 	int index; /* For stable sorting. */
 } WordData;
 
@@ -88,6 +88,7 @@ int num_word_data = 0;
 
 PhraseData phrase_data[MAX_PHRASE_DATA];
 int num_phrase_data = 0;
+int top_phrase_data = MAX_PHRASE_DATA;
 
 NODE *root;
 
@@ -118,8 +119,8 @@ int compare_word_by_phone(const void *x, const void *y)
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
 
-	if (a->text.phone[0] != b->text.phone[0])
-		return b->text.phone[0] - a->text.phone[0];
+	if (a->text->phone[0] != b->text->phone[0])
+		return b->text->phone[0] - a->text->phone[0];
 
 	/* Compare original index for stable sort */
 	return b->index - a->index;
@@ -129,13 +130,13 @@ int compare_word_by_text(const void *x, const void *y)
 {
 	const WordData *a = (const WordData *)x;
 	const WordData *b = (const WordData *)y;
-	int ret = strcmp(a->text.phrase, b->text.phrase);
+	int ret = strcmp(a->text->phrase, b->text->phrase);
 
 	if (ret != 0)
 		return ret;
 
-	if (a->text.phone[0] != b->text.phone[0])
-		return a->text.phone[0] - b->text.phone[0];
+	if (a->text->phone[0] != b->text->phone[0])
+		return a->text->phone[0] - b->text->phone[0];
 
 	return 0;
 }
@@ -157,7 +158,7 @@ void store_phrase(const char *line, int line_num)
 	if (strlen(buf) == 0)
 		return;
 
-	if (num_phrase_data >= MAX_PHRASE_DATA) {
+	if (num_phrase_data >= top_phrase_data) {
 		fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
 		exit(-1);
 	}
@@ -206,18 +207,21 @@ void store_phrase(const char *line, int line_num)
 	}
 
 	/* Check that each word in phrase can be found in word list. */
+	word.text = ALC(PhraseData, 1);
+	assert(word.text);
 	for (i = 0; i < phrase_len; ++i) {
-		ueStrNCpy(word.text.phrase, ueStrSeek(phrase_data[num_phrase_data].phrase, i), 1, 1);
-		word.text.phone[0] = phrase_data[num_phrase_data].phone[i];
+		ueStrNCpy(word.text->phrase, ueStrSeek(phrase_data[num_phrase_data].phrase, i), 1, 1);
+		word.text->phone[0] = phrase_data[num_phrase_data].phone[i];
 		if (bsearch(&word, word_data, num_word_data, sizeof(word), compare_word_by_text) == NULL) {
 		        /* Please delete this #if after resoving exception phrase cases. */
 #if 0
-			PhoneFromUint(bopomofo_buf, sizeof(bopomofo_buf), word.text.phone[0]);
-			fprintf(stderr, "Phrase:%d:error:`%s': `%s' has no phone `%s'\n", line_num, phrase_data[num_phrase_data].phrase, word.text.phrase, bopomofo_buf);
+			PhoneFromUint(bopomofo_buf, sizeof(bopomofo_buf), word.text->phone[0]);
+			fprintf(stderr, "Phrase:%d:error:`%s': `%s' has no phone `%s'\n", line_num, phrase_data[num_phrase_data].phrase, word.text->phrase, bopomofo_buf);
 			exit(-1);
 #endif
 		}
 	}
+	free(word.text);
 
 	if (phrase_len >= 2)
 		++num_phrase_data;
@@ -276,19 +280,24 @@ void store_word(const char *line, const int line_num)
 		fprintf(stderr, "Need to increase MAX_WORD_DATA to process\n");
 		exit(-1);
 	}
+	if (top_phrase_data <= num_phrase_data) {
+                fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
+		exit(-1);
+	}
+	word_data[num_word_data].text = &phrase_data[--top_phrase_data];
 
 #define UTF8_FORMAT_STRING(len1, len2) \
 	"%" __stringify(len1) "[^ ]" " " \
 	"%" __stringify(len2) "[^ ]"
 	sscanf(buf, UTF8_FORMAT_STRING(ZUIN_SIZE, MAX_UTF8_SIZE),
-		key_buf, word_data[num_word_data].text.phrase);
+		key_buf, word_data[num_word_data].text->phrase);
 
 	if (strlen(key_buf) > ZUIN_SIZE) {
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
-	word_data[num_word_data].text.phone[0] = UintFromPhone(phone_buf);
+	word_data[num_word_data].text->phone[0] = UintFromPhone(phone_buf);
 
 	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
@@ -432,14 +441,14 @@ void construct_phrase_tree()
 
 	/* Second, insert word_data as the first level of children. */
 	for (i = 0; i < num_word_data; i++) {
-		if (i == 0 || word_data[i].text.phone[0] != word_data[i - 1].text.phone[0]) {
-			levelPtr = new_node(word_data[i].text.phone[0]);
+		if (i == 0 || word_data[i].text->phone[0] != word_data[i - 1].text->phone[0]) {
+			levelPtr = new_node(word_data[i].text->phone[0]);
 			levelPtr->pNextSibling = root->pFirstChild;
 			root->pFirstChild = levelPtr;
 		}
 		levelPtr = new_node(0);
-		levelPtr->data.phrase.pos = (uint32_t)word_data[i].text.pos;
-		levelPtr->data.phrase.freq = word_data[i].text.freq;
+		levelPtr->data.phrase.pos = (uint32_t)word_data[i].text->pos;
+		levelPtr->data.phrase.freq = word_data[i].text->freq;
 		levelPtr->pNextSibling = root->pFirstChild->pFirstChild;
 		root->pFirstChild->pFirstChild = levelPtr;
 	}
@@ -479,9 +488,9 @@ void write_phrase_data()
 		if (i == num_word_data)
 			cur_phr = &phrase_data[j++];
 		else if (j == num_phrase_data)
-			cur_phr = &word_data[i++].text;
-		else if (strcmp(word_data[i].text.phrase, phrase_data[j].phrase) < 0)
-			cur_phr = &word_data[i++].text;
+			cur_phr = word_data[i++].text;
+		else if (strcmp(word_data[i].text->phrase, phrase_data[j].phrase) < 0)
+			cur_phr = word_data[i++].text;
 		else
 			cur_phr = &phrase_data[j++];
 
