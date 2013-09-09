@@ -14,7 +14,12 @@
 
 /**
  * @file key2pho.c
- * @brief map zuins to uint16_t type according to different kb_type
+ * @brief Bidirectional mapping between key-in sequences and indices.
+ * 
+ * 	1. Map zhuins to uint16_t type according to different kb_type.\n
+ * 		Build: Key <-> Zhuin plaintext <-> uint16_t\n
+ * 		Runtime: Key <-> Index to Zhuin Table <-> uint16_t\n
+ * 	2. Map generalized key-in sequences to uint32_t type.
  */
 
 /* This file is encoded in UTF-8 */
@@ -23,6 +28,7 @@
 #include <string.h>
 #include "chewing-utf8-util.h"
 #include "chewing-private.h"
+#include "zuin-private.h" /* For KB_DEFAULT. */
 
 /* NOTE:
  * The reason why we convert string literal to hex representation is for the
@@ -198,3 +204,34 @@ uint16_t UintFromPhoneInx( const int ph_inx[] )
 	return result;
 }
 
+#ifdef SUPPORT_MULTI_IM
+uint32_t EncodeZuinKey(const char *seq)
+{
+	char phone_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
+	PhoneFromKey(phone_buf, seq, KB_DEFAULT, 1);
+	return UintFromPhone(phone_buf);
+}
+
+uint32_t EncodeKeyin(const char *seq)
+{
+	uint32_t r = 0;
+	const unsigned char *p = (unsigned char*)seq;
+	for(; *p != '\0'; p++)
+		r = (r<<8) | *p;
+	return r;
+}
+
+/**
+ * Return "int" is designed for consistency with PHONEfROMuINT(). It raises some
+ * errors, because not all keys are corresponding to a zhuin symbol. But this
+ * function raises no error because of the generality of IM.
+ */
+int DecodeKeyin(char *buf, size_t len, uint32_t code)
+{
+	size_t end = min(4, len-1), i;
+	for(i = 0; i < end; i++)
+		buf[i] = ( code >> ( 8*(3-i) ) ) & 0xff;
+	buf[end] = '\0';
+	return 1;
+}
+#endif
