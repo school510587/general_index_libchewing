@@ -101,7 +101,12 @@ typedef struct _ChewingContext ChewingContext;
 
 /**
  * @brief Record of a key-in sequence corresponding to a word.
+ *        To enable multi-IM functions, use --enable-multiple-IM.
  */
+#ifdef SUPPORT_MULTI_IM
+typedef unsigned long KeySeqWord;
+#else
 typedef unsigned short KeySeqWord;
+#endif
 
 #endif

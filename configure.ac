@@ -102,6 +102,15 @@ AC_ARG_ENABLE([gcov],
               [ENABLE_GCOV="false"])
 AS_IF([test x$ENABLE_GCOV = x"true"], [AM_CFLAGS="$AM_CFLAGS --coverage"])
 
+dnl Enable multi-IM support
+AC_ARG_ENABLE([multi-IM],
+              [AS_HELP_STRING([--enable-multi-IM], [Turn on multi-IM support @<:@default=no@:>@])],
+              [AS_CASE([${enableval}], [yes], [ENABLE_MULTI_IM="true"], [ENABLE_MULTI_IM="false"])],
+              [ENABLE_MULTI_IM="false"])
+AS_IF([test x$ENABLE_MULTI_IM = x"true"], [AM_CFLAGS="$AM_CFLAGS -DSUPPORT_MULTI_IM"])
+AC_SUBST(MULTI_IM)
+AM_CONDITIONAL(MULTI_IM, test x$ENABLE_MULTI_IM = "xtrue")
+
 dnl Adds -fvisibility=hidden to CFLAGS if running with gcc 4 or greater.
 AC_MSG_CHECKING([whether the compiler supports GCC Visibility])
 dnl Check for gcc4 or greater

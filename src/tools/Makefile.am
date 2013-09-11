@@ -7,6 +7,9 @@ INCLUDES = \
 	$(NULL)
 
 CC = $(CC_FOR_BUILD)
+if MULTI_IM
+CFLAGS_FOR_BUILD = -DSUPPORT_MULTI_IM
+endif
 AM_CFLAGS = $(CFLAGS_FOR_BUILD)
 
 noinst_PROGRAMS = init_database
