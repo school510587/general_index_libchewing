@@ -29,6 +29,7 @@
 #include "zuin-private.h"
 
 /* Important tokens in a cin file. */
+#define ENAME     "%ename"
 #define CHARDEF	  "%chardef"
 #define BEGIN	      "begin"
 #define END		  "end"
@@ -146,7 +147,11 @@ static void store_word(const char *line, const int line_num)
 	++num_word_data;
 }
 
+#ifdef SUPPORT_MULTI_IM
+void read_IM_cin(const char *filename, char *IM_name)
+#else
 void read_IM_cin(const char *filename)
+#endif
 {
 	FILE *IM_cin;
 	char buf[MAX_LINE_LEN];
@@ -179,6 +184,15 @@ void read_IM_cin(const char *filename)
 				exit(-1);
 			}
 		}
+#ifdef SUPPORT_MULTI_IM
+		else if (IM_name && !strcmp(ret, ENAME)) {
+			ret = strtok(NULL, " \t");
+			if (ret) {
+				strncpy(IM_name, ret, MAX_IM_NAME_LEN);
+				IM_name[MAX_IM_NAME_LEN] = '\0';
+			}
+		}
+#endif
 	}
 
 	while (status != HAS_CHARDEF_END) {

@@ -53,8 +53,13 @@ int compare_word_by_text(const void *x, const void *y);
 /**
  * @brief IM cin reader. Result word_data is sorted by compare_word_by_text.
  * @param filename The path of cin file.
+ * @param IM_name  Buffer for name of the IM. It can be NULL.
  */
+#ifdef SUPPORT_MULTI_IM
+void read_IM_cin(const char *filename, char *IM_name);
+#else
 void read_IM_cin(const char *filename);
+#endif
 
 /**
  * @brief Index tree writer.
