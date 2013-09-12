@@ -38,7 +38,6 @@
 #include "build_tool.h"
 #include "chewing-utf8-util.h"
 #include "global-private.h"
-#include "key2pho-private.h"
 
 /* For ALC macro */
 #include "private.h"
@@ -290,7 +289,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef SUPPORT_MULTI_IM
-	read_IM_cin(argv[1], NULL);
+	read_IM_cin(argv[1], NULL, EncodeZuinKey);
 #else
 	read_IM_cin(argv[1]);
 #endif

@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "build_tool.h"
-#include "key2pho-private.h"
 #include "private.h" /* For ALC macro. */
 #include "zuin-private.h"
 
@@ -111,9 +110,14 @@ int compare_word_by_text(const void *x, const void *y)
 	return 0;
 }
 
+#ifdef SUPPORT_MULTI_IM
+static void store_word(const char *line, const int line_num, EncFunct encode)
+{
+#else
 static void store_word(const char *line, const int line_num)
 {
 	char phone_buf[MAX_UTF8_SIZE * ZUIN_SIZE + 1];
+#endif
 	char key_buf[ZUIN_SIZE + 1];
 	char buf[MAX_LINE_LEN];
 
@@ -140,15 +144,19 @@ static void store_word(const char *line, const int line_num)
 		fprintf(stderr, "Error reading line %d, `%s'\n", line_num, line);
 		exit(-1);
 	}
+#ifdef SUPPORT_MULTI_IM
+	word_data[num_word_data].text->phone[0] = encode(key_buf);
+#else
 	PhoneFromKey(phone_buf, key_buf, KB_DEFAULT, 1);
 	word_data[num_word_data].text->phone[0] = UintFromPhone(phone_buf);
+#endif
 
 	word_data[num_word_data].index = num_word_data;
 	++num_word_data;
 }
 
 #ifdef SUPPORT_MULTI_IM
-void read_IM_cin(const char *filename, char *IM_name)
+void read_IM_cin(const char *filename, char *IM_name, EncFunct encode)
 #else
 void read_IM_cin(const char *filename)
 #endif
@@ -158,6 +166,10 @@ void read_IM_cin(const char *filename)
 	char *ret;
 	int line_num = 0;
 	enum{INIT, HAS_CHARDEF_BEGIN, HAS_CHARDEF_END} status;
+
+#ifdef SUPPORT_MULTI_IM
+	assert(encode);
+#endif
 
 	IM_cin = fopen(filename, "r");
 	if (!IM_cin) {
@@ -215,7 +227,11 @@ void read_IM_cin(const char *filename)
 			}
 		}
 		else
+#ifdef SUPPORT_MULTI_IM
+			store_word(buf, line_num, encode);
+#else
 			store_word(buf, line_num);
+#endif
 	}
 
 	fclose(IM_cin);

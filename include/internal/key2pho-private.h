@@ -28,6 +28,8 @@ int PhoneFromUint( char *phone, size_t phone_len, uint16_t phone_num );
 int PhoneInxFromKey( int key, int type, int kbtype, int searchTimes );
 
 #ifdef SUPPORT_MULTI_IM
+typedef uint32_t (*EncFunct)( const char* );
+
 uint32_t EncodeZuinKey( const char *seq );
 uint32_t EncodeKeyin( const char *seq );
 int DecodeKeyin( char *buf, size_t len, uint32_t code );

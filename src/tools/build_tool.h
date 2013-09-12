@@ -3,6 +3,7 @@
 
 #include "chewing-private.h"
 #include "global.h"
+#include "key2pho-private.h"
 
 #define MAX_LINE_LEN        (1024)
 #define MAX_WORD_DATA      (60000)
@@ -56,7 +57,7 @@ int compare_word_by_text(const void *x, const void *y);
  * @param IM_name  Buffer for name of the IM. It can be NULL.
  */
 #ifdef SUPPORT_MULTI_IM
-void read_IM_cin(const char *filename, char *IM_name);
+void read_IM_cin(const char *filename, char *IM_name, EncFunct encode);
 #else
 void read_IM_cin(const char *filename);
 #endif
