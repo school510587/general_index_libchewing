@@ -73,19 +73,21 @@ typedef union {
  * phrase using a specific input method (may be bopomofo or non-phone). Note
  * that key in root represents the number of total elements(nodes) in the tree.
  */
+#pragma pack(1)
 typedef struct {
-	uint32_t key;
+	uint16_t key;
 	union {
 		struct {
-			uint32_t begin;
-			uint32_t end;
+			uint32_t begin:24;
+			uint32_t end:24;
 		} child;
 		struct {
-			uint32_t pos;
-			int32_t freq;
+			uint32_t pos:24;
+			int32_t freq:24;
 		} phrase;
 	};
 } TreeType;
+#pragma pack()
 
 typedef struct {
 	char chiBuf[ MAX_PHONE_SEQ_LEN * MAX_UTF8_SIZE + 1 ];
