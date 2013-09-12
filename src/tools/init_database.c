@@ -15,7 +15,10 @@
  *
  *	This program reads in source of dictionary.\n
  *	Output a database file containing a phone phrase tree, and a dictionary file\n
- * filled with non-duplicate phrases.\n
+ * containing non-duplicate phrases. To determine frequency of each phrase in\n
+ * generation of other IM index, it outputs a log of 32-bit binary integers recording\n
+ * total frequency for each non-duplicate phrase for build-time requirement of other\n
+ * IM index.\n
  *	Each node represents a single phone.\n
  *	The output file contains a random access array, where each record includes:\n
  *	\code{
@@ -53,6 +56,9 @@ const char USAGE[] =
 	"This program creates the following new files:\n"
 	"* " PHONE_TREE_FILE "\n\tindex to phrase file (dictionary)\n"
 	"* " DICT_FILE "\n\tmain phrase file\n"
+#ifdef SUPPORT_MULTI_IM
+	"* " FREQ_FILE "\n\tlog of total frequency\n"
+#endif
 ;
 
 /*
@@ -209,17 +215,28 @@ void read_tsi_src(const char *filename)
 void write_phrase_data()
 {
 	FILE *dict_file;
+#ifdef SUPPORT_MULTI_IM
+	FILE *freq_file;
+	int32_t total_freq = 0;
+#endif
 	PhraseData *cur_phr;
 	PhraseData *last_phr = NULL;
 	int i;
 	int j;
 
 	dict_file = fopen(DICT_FILE, "wb");
-
 	if (!dict_file) {
 		fprintf(stderr, "Cannot open output file.\n");
 		exit(-1);
 	}
+
+#ifdef SUPPORT_MULTI_IM
+	freq_file = fopen(FREQ_FILE, "wb");
+	if (!freq_file) {
+		fprintf(stderr, "Cannot open output file.\n");
+		exit(-1);
+	}
+#endif
 
 	/*
 	 * Duplicate Chinese strings with common pronunciation are detected and
@@ -238,13 +255,29 @@ void write_phrase_data()
 		else
 			cur_phr = &phrase_data[j++];
 
-		if (last_phr && !strcmp(cur_phr->phrase, last_phr->phrase))
+		if (last_phr && !strcmp(cur_phr->phrase, last_phr->phrase)) {
 			cur_phr->pos = last_phr->pos;
+#ifdef SUPPORT_MULTI_IM
+			total_freq += cur_phr->freq;
+#endif
+		}
 		else {
 			cur_phr->pos = ftell(dict_file);
 			fwrite(cur_phr->phrase, strlen(cur_phr->phrase) + 1, 1, dict_file);
+#ifdef SUPPORT_MULTI_IM
+			if (last_phr) {
+				fwrite(&total_freq, 1, sizeof(total_freq), freq_file);
+				total_freq = cur_phr->freq;
+			}
+#endif
 		}
 	}
+
+#ifdef SUPPORT_MULTI_IM
+	/* The last unwritten total_freq. */
+	fwrite(&total_freq, 1, sizeof(total_freq), freq_file);
+	fclose(freq_file);
+#endif
 
 	fclose(dict_file);
 }

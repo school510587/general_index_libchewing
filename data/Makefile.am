@@ -1,7 +1,13 @@
 tooldir = $(top_builddir)/src/tools
+if MULTI_IM
+freq_record = total_freq.dat
+else
+freq_record = $(NULL)
+endif
 datas = \
 	dictionary.dat \
 	index_tree.dat \
+	$(freq_record) \
 	$(NULL)
 static_tables = pinyin.tab swkb.dat symbols.dat
 

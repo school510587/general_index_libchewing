@@ -15,6 +15,9 @@
 
 #define PHONE_TREE_FILE		"index_tree.dat"
 #define DICT_FILE		"dictionary.dat"
+#ifdef SUPPORT_MULTI_IM
+#  define FREQ_FILE 		"total_freq.dat"
+#endif
 #define SYMBOL_TABLE_FILE	"symbols.dat"
 #define SOFTKBD_TABLE_FILE	"swkb.dat"
 #define PINYIN_TAB_NAME         "pinyin.tab"
