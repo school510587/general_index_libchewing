@@ -397,7 +397,7 @@ void internal_ok_keystroke_rtn( const char *file, int line,
 int internal_has_userphrase( const char *file UNUSED, int line UNUSED,
 	ChewingContext *ctx, const char *bopomofo, const char *phrase )
 {
-	uint16_t *phone = NULL;
+	KeySeqWord *phone = NULL;
 	char *bopomofo_buf = NULL;
 	int i;
 	char *p;

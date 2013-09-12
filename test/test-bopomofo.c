@@ -596,7 +596,7 @@ void test_get_phoneSeq()
 {
 	static const struct {
 		char *token;
-		unsigned short phone[5];
+		KeySeqWord phone[5];
 	} DATA[] = {
 		{ "hk4g4", { 10268, 8708, 0 } },
 		{ "hk4g4`31hk4g4", { 10268, 8708, 10268, 8708, 0 } },
@@ -606,7 +606,7 @@ void test_get_phoneSeq()
 	size_t i;
 	int expected_len;
 	int len;
-	unsigned short *phone;
+	KeySeqWord *phone;
 
 
 	ctx = chewing_new();

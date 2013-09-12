@@ -115,7 +115,7 @@ static int CheckBreakpoint( int from, int to, int bArrBrkpt[] )
 
 static int CheckUserChoose(
 		ChewingData *pgdata,
-		uint16_t *new_phoneSeq, int from , int to,
+		KeySeqWord *new_phoneSeq, int from , int to,
 		Phrase **pp_phr,
 		char selectStr[][ MAX_PHONE_SEQ_LEN * MAX_UTF8_SIZE + 1 ],
 		IntervalType selectInterval[], int nSelect )
@@ -247,7 +247,7 @@ static int CompTreeType( const void *a, const void *b )
 /* if phoneSeq[begin] ~ phoneSeq[end] is a phrase, then add an interval
  * from (begin) to (end+1)
  */
-const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const uint16_t *phoneSeq )
+const TreeType *TreeFindPhrase( ChewingData *pgdata, int begin, int end, const KeySeqWord *phoneSeq )
 {
 	TreeType target;
 	const TreeType *tree_p = pgdata->static_data.tree;
@@ -323,7 +323,7 @@ static void FindInterval( ChewingData *pgdata, TreeDataType *ptd )
 	const TreeType *phrase_parent;
 	Phrase *p_phrase, *puserphrase, *pdictphrase;
 	UsedPhraseMode i_used_phrase;
-	uint16_t new_phoneSeq[ MAX_PHONE_SEQ_LEN ];
+	KeySeqWord new_phoneSeq[ MAX_PHONE_SEQ_LEN ];
 
 	for ( begin = 0; begin < pgdata->nPhoneSeq; begin++ ) {
 		for ( end = begin; end < pgdata->nPhoneSeq; end++ ) {
@@ -334,7 +334,7 @@ static void FindInterval( ChewingData *pgdata, TreeDataType *ptd )
 			memcpy(
 				new_phoneSeq,
 				&pgdata->phoneSeq[ begin ],
-				sizeof( uint16_t ) * ( end - begin + 1 ) );
+				sizeof( KeySeqWord ) * ( end - begin + 1 ) );
 			new_phoneSeq[ end - begin + 1 ] = 0;
 			puserphrase = pdictphrase = NULL;
 			i_used_phrase = USED_PHRASE_NONE;
@@ -546,7 +546,7 @@ static void Discard2( TreeDataType *ptd )
 	ptd->nInterval = nInterval2;
 }
 
-static void LoadChar( ChewingData *pgdata, char *buf, int buf_len, const uint16_t phoneSeq[], int nPhoneSeq )
+static void LoadChar( ChewingData *pgdata, char *buf, int buf_len, const KeySeqWord phoneSeq[], int nPhoneSeq )
 {
 	int i;
 	Phrase word;
@@ -564,7 +564,7 @@ static void OutputRecordStr(
 		ChewingData *pgdata,
 		char *out_buf, int out_buf_len,
 		const int *record, int nRecord,
-		uint16_t phoneSeq[], int nPhoneSeq,
+		KeySeqWord phoneSeq[], int nPhoneSeq,
 		char selectStr[][ MAX_PHONE_SEQ_LEN * MAX_UTF8_SIZE + 1 ],
 		IntervalType selectInterval[],
 		int nSelect, const TreeDataType *ptd )

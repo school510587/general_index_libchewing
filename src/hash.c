@@ -27,7 +27,7 @@
 
 int AlcUserPhraseSeq( UserPhraseData *pData, int phonelen, int wordlen )
 {
-	pData->phoneSeq = ALC( uint16_t, phonelen + 1 );
+	pData->phoneSeq = ALC( KeySeqWord, phonelen + 1 );
 	if ( !pData->phoneSeq )
 		goto error;
 	pData->wordSeq = ALC( char, wordlen + 1 );
@@ -42,7 +42,7 @@ error:
 	return 0;
 }
 
-static int PhoneSeqTheSame( const uint16_t p1[], const uint16_t p2[] )
+static int PhoneSeqTheSame( const KeySeqWord p1[], const KeySeqWord p2[] )
 {
 	int i;
 	if ( ! p1 || ! p2 )	/* FIXME: should not happend. */
@@ -57,7 +57,7 @@ static int PhoneSeqTheSame( const uint16_t p1[], const uint16_t p2[] )
 	return 1;
 }
 
-static unsigned int HashFunc( const uint16_t phoneSeq[] )
+static unsigned int HashFunc( const KeySeqWord phoneSeq[] )
 {
 	int i, value = 0;
 
@@ -66,7 +66,7 @@ static unsigned int HashFunc( const uint16_t phoneSeq[] )
 	return ( value & ( HASH_TABLE_SIZE - 1 ) );
 }
 
-HASH_ITEM *HashFindPhonePhrase( ChewingData *pgdata, const uint16_t phoneSeq[], HASH_ITEM *pItemLast )
+HASH_ITEM *HashFindPhonePhrase( ChewingData *pgdata, const KeySeqWord phoneSeq[], HASH_ITEM *pItemLast )
 {
 	HASH_ITEM *pNow = pItemLast ?
 			pItemLast->next :
@@ -78,7 +78,7 @@ HASH_ITEM *HashFindPhonePhrase( ChewingData *pgdata, const uint16_t phoneSeq[], 
 	return NULL;
 }
 
-HASH_ITEM *HashFindEntry( ChewingData *pgdata, const uint16_t phoneSeq[], const char wordSeq[] )
+HASH_ITEM *HashFindEntry( ChewingData *pgdata, const KeySeqWord phoneSeq[], const char wordSeq[] )
 {
 	HASH_ITEM *pItem;
 	int hashvalue;
@@ -247,7 +247,7 @@ static int ReadHashItem_bin( const char *srcbuf, HASH_ITEM *pItem, int item_inde
 
 	/* phone seq, length in num of chi words */
 	len = (int) srcbuf[ 16 ];
-	pItem->data.phoneSeq = ALC( uint16_t, len + 1 );
+	pItem->data.phoneSeq = ALC( KeySeqWord, len + 1 );
 	pc = &srcbuf[ 17 ];
 	for ( i = 0; i < len; i++ ) {
 		pItem->data.phoneSeq[ i ] = GetUint16( pc );
@@ -307,7 +307,7 @@ static int ReadHashItem_txt( FILE *infile, HASH_ITEM *pItem, int item_index )
 
 	/* read phoneSeq */
 	len = ueStrLen( pItem->data.wordSeq );
-	pItem->data.phoneSeq = ALC( uint16_t, len + 1 );
+	pItem->data.phoneSeq = ALC( KeySeqWord, len + 1 );
 	for ( i = 0; i < len; i++ )
 		if ( fscanf( infile, "%hu", &( pItem->data.phoneSeq[ i ] ) ) != 1 )
 			return 0;

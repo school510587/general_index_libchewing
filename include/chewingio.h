@@ -537,7 +537,7 @@ CHEWING_API int chewing_get_phraseChoiceRearward( ChewingContext *ctx );
  *
  * @param ctx
  */
-CHEWING_API unsigned short *chewing_get_phoneSeq( ChewingContext *ctx );
+CHEWING_API KeySeqWord *chewing_get_phoneSeq( ChewingContext *ctx );
 
 /**
  * @brief Get the length of phonetic sequence in Chewing internal state machine

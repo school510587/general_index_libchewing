@@ -2,6 +2,7 @@
 #define BUILD_TOOL_H
 
 #include "chewing-private.h"
+#include "global.h"
 
 #define MAX_LINE_LEN        (1024)
 #define MAX_WORD_DATA      (60000)
@@ -16,7 +17,7 @@
 typedef struct {
 	char phrase[MAX_PHRASE_BUF_LEN];
 	int freq;
-	uint16_t phone[MAX_PHRASE_LEN + 1];
+	KeySeqWord phone[MAX_PHRASE_LEN + 1];
 	long pos;
 } PhraseData;
 

@@ -30,10 +30,10 @@ typedef struct tag_HASH_ITEM {
 	struct tag_HASH_ITEM *next;
 } HASH_ITEM;
 
-HASH_ITEM *HashFindPhone( const uint16_t phoneSeq[] );
-HASH_ITEM *HashFindEntry( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[], const char wordSeq[] );
+HASH_ITEM *HashFindPhone( const KeySeqWord phoneSeq[] );
+HASH_ITEM *HashFindEntry( struct tag_ChewingData *pgdata, const KeySeqWord phoneSeq[], const char wordSeq[] );
 HASH_ITEM *HashInsert( struct tag_ChewingData *pgdata, UserPhraseData *pData );
-HASH_ITEM *HashFindPhonePhrase( struct tag_ChewingData *pgdata, const uint16_t phoneSeq[], HASH_ITEM *pHashLast );
+HASH_ITEM *HashFindPhonePhrase( struct tag_ChewingData *pgdata, const KeySeqWord phoneSeq[], HASH_ITEM *pHashLast );
 void HashModify( struct tag_ChewingData *pgdata, HASH_ITEM *pItem );
 int AlcUserPhraseSeq( UserPhraseData *pData, int phonelen, int wordlen );
 int InitHash( struct tag_ChewingData *ctx );
