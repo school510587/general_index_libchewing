@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include/internal \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/porting_layer/include \
+	-I$(top_srcdir)/src/tools \
 	-I$(top_srcdir)/thirdparty/sqlite-amalgamation \
 	$(DEFAULT_CPPFLAGS) \
 	$(NULL)
@@ -14,6 +15,7 @@ noinst_PROGRAMS = init_database
 
 init_database_SOURCES = \
 	init_database.c \
+	build-tool.c \
 	$(top_srcdir)/src/common/chewing-utf8-util.c \
 	$(top_srcdir)/src/common/key2pho.c \
 	$(NULL)
