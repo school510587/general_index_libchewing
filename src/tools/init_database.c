@@ -409,22 +409,22 @@ void store_word(const char *line, const int line_num)
 	++num_word_data;
 }
 
-void read_phone_cin(const char *filename)
+void read_IM_cin(const char *filename)
 {
-	FILE *phone_cin;
+	FILE *IM_cin;
 	char buf[MAX_LINE_LEN];
 	char *ret;
 	int line_num = 0;
 	enum{INIT, HAS_CHARDEF_BEGIN, HAS_CHARDEF_END} status;
 
-	phone_cin = fopen(filename, "r");
-	if (!phone_cin) {
+	IM_cin = fopen(filename, "r");
+	if (!IM_cin) {
 		fprintf(stderr, "Error opening the file %s\n", filename);
 		exit(-1);
 	}
 
 	for (status = INIT; status != HAS_CHARDEF_BEGIN; ) {
-		ret = fgets(buf, sizeof(buf), phone_cin);
+		ret = fgets(buf, sizeof(buf), IM_cin);
 		++line_num;
 		if (!ret) {
 			fprintf(stderr, "%s: No expected %s %s\n", filename, CHARDEF, BEGIN);
@@ -445,7 +445,7 @@ void read_phone_cin(const char *filename)
 	}
 
 	while (status != HAS_CHARDEF_END) {
-		ret = fgets(buf, sizeof(buf), phone_cin);
+		ret = fgets(buf, sizeof(buf), IM_cin);
 		++line_num;
 		if (!ret) {
 			fprintf(stderr, "%s: No expected %s %s\n", filename, CHARDEF, END);
@@ -467,7 +467,7 @@ void read_phone_cin(const char *filename)
 			store_word(buf, line_num);
 	}
 
-	fclose(phone_cin);
+	fclose(IM_cin);
 
 	qsort(word_data, num_word_data, sizeof(word_data[0]), compare_word_no_duplicated);
 }
@@ -634,6 +634,8 @@ void write_index_tree()
 		exit(-1);
 	}
 
+	construct_phrase_tree();
+
 	queue = ALC(NODE*, q_len + 1);
 	assert(queue);
 
@@ -685,10 +687,9 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	read_phone_cin(argv[1]);
+	read_IM_cin(argv[1]);
 	read_tsi_src(argv[2]);
 	write_phrase_data();
-	construct_phrase_tree();
 	write_index_tree();
 	return 0;
 }
