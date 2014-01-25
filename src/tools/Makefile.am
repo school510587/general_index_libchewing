@@ -9,7 +9,11 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 CC = $(CC_FOR_BUILD)
-AM_CFLAGS = $(CFLAGS_FOR_BUILD)
+if SUPPORT_MULTI_IM
+	AM_CFLAGS = $(CFLAGS_FOR_BUILD) -DSUPPORT_MULTI_IM
+else
+	AM_CFLAGS = $(CFLAGS_FOR_BUILD)
+endif
 
 noinst_PROGRAMS = init_database dump_database
 
