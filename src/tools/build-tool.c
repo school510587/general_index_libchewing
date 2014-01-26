@@ -32,6 +32,7 @@
 /* For ALC macro */
 #include "private.h"
 
+#define ENAME   		"%ename"
 #define CHARDEF			"%chardef"
 #define BEGIN			"begin"
 #define END			"end"
@@ -53,6 +54,11 @@ typedef struct _tNODE {
 	struct _tNODE *pFirstChild;
 	struct _tNODE *pNextSibling;
 } NODE;
+
+#ifdef SUPPORT_MULTI_IM
+/* Internal buffer for input method name. */
+char IM_name[MAX_IM_NAME_LEN + 1];
+#endif
 
 /* word_data and phrase_data can be referenced from outside (extern). */
 WordData word_data[MAX_WORD_DATA];
@@ -198,6 +204,15 @@ void read_IM_cin(const char *filename)
 				exit(-1);
 			}
 		}
+#ifdef SUPPORT_MULTI_IM
+		else if (!IM_name[0] && !strcmp(ret, ENAME)) {
+			ret = strtok(NULL, " \t");
+			if (ret) {
+				strncpy(IM_name, ret, MAX_IM_NAME_LEN);
+				IM_name[MAX_IM_NAME_LEN] = '\0';
+			}
+		}
+#endif
 	}
 
 	while (status != HAS_CHARDEF_END) {

@@ -15,6 +15,7 @@
 
 #ifdef SUPPORT_MULTI_IM
 #  define FREQ_FILE     	"total_freq.dat"
+#  define PHONETIC      	"Phonetic"
 #endif
 #define PHONE_TREE_FILE		"index_tree.dat"
 #define DICT_FILE		"dictionary.dat"

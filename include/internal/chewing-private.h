@@ -52,6 +52,10 @@ typedef SSIZE_T ssize_t;
 #define EASY_SYMBOL_KEY_TAB_LEN (36)
 #define AUX_PREFIX_LEN (3)
 
+#ifdef SUPPORT_MULTI_IM
+#  define MAX_IM_NAME_LEN        (39)
+#endif
+
 /* For isSymbol */
 #define WORD_CHOICE            (0)
 #define SYMBOL_CATEGORY_CHOICE (1)
