@@ -355,7 +355,15 @@ void write_index_tree()
 	int tree_size = 1;
 	size_t q_len = num_word_data + num_phrase_data;
 
+#ifdef SUPPORT_MULTI_IM
+	char filename[FILENAME_MAX];
+	FILE *output;
+
+	sprintf(filename, "%s" INDEX_TREE_FILE, IM_name);
+	output = fopen(filename, "wb");
+#else
 	FILE *output = fopen(PHONE_TREE_FILE, "wb");
+#endif
 
 	if (!output) {
 		fprintf(stderr, "Error opening file " PHONE_TREE_FILE " for output.\n");
