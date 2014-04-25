@@ -33,6 +33,7 @@
 /* For ALC macro */
 #include "private.h"
 
+#define ENAME                 "%ename"
 #define CHARDEF               "%chardef"
 #define BEGIN                 "begin"
 #define END                   "end"
@@ -49,6 +50,11 @@ typedef struct _tNODE {
     struct _tNODE *pFirstChild;
     struct _tNODE *pNextSibling;
 } NODE;
+
+#ifdef SUPPORT_MULTI_IM
+/* Internal buffer for input method name. */
+static char IM_name[MAX_IM_NAME_LEN + 1];
+#endif
 
 /* word_data and phrase_data can be referenced from outside (extern). */
 WordData word_data[MAX_WORD_DATA];
@@ -194,6 +200,15 @@ void read_IM_cin(const char *filename)
                 exit(-1);
             }
         }
+#ifdef SUPPORT_MULTI_IM
+        else if (!IM_name[0] && !strcmp(ret, ENAME)) {
+            ret = strtok(NULL, " \t");
+            if (ret) {
+                strncpy(IM_name, ret, MAX_IM_NAME_LEN);
+                IM_name[MAX_IM_NAME_LEN] = '\0';
+            }
+        }
+#endif
     }
 
     while (status != HAS_CHARDEF_END) {
@@ -334,7 +349,15 @@ void write_index_tree()
     size_t tree_size = 1;
     size_t q_len = num_word_data + num_phrase_data + 1;
 
+#ifdef SUPPORT_MULTI_IM
+    char filename[FILENAME_MAX];
+    FILE *output;
+
+    sprintf(filename, "%s" INDEX_TREE_FILE, IM_name);
+    output = fopen(filename, "wb");
+#else
     FILE *output = fopen(PHONE_TREE_FILE, "wb");
+#endif
 
     if (!output) {
         fprintf(stderr, "Error opening file " PHONE_TREE_FILE " for output.\n");
