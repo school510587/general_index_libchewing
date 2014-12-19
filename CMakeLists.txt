@@ -160,13 +160,14 @@ foreach(target ${ALL_STATIC_TEST})
 endforeach()
 
 # tools
-set(ALL_TOOLS init_database)
+set(ALL_TOOLS init_database dump_database)
 add_executable(init_database
 	${TOOLS_SRC_DIR}/init_database.c
 	${TOOLS_SRC_DIR}/build_tool.c
 	${TOOLS_SRC_DIR}/build_tool.h
 	$<TARGET_OBJECTS:common>
 )
+add_executable(dump_database ${TOOLS_SRC_DIR}/dump_database.c)
 set_target_properties(${ALL_TOOLS} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${TOOLS_BIN_DIR}
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TOOLS_BIN_DIR}

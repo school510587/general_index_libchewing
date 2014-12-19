@@ -13,7 +13,7 @@ endif
 AM_CFLAGS = $(CFLAGS_FOR_BUILD)
 
 if MULTI_IM
-noinst_PROGRAMS = init_database gen_IM_data
+noinst_PROGRAMS = init_database gen_IM_data dump_database
 
 gen_IM_data_SOURCES = \
 	gen_IM_data.c \
@@ -25,7 +25,7 @@ gen_IM_data_SOURCES = \
 	$(NULL)
 
 else
-noinst_PROGRAMS = init_database
+noinst_PROGRAMS = init_database dump_database
 endif
 
 init_database_SOURCES = \
@@ -35,9 +35,13 @@ init_database_SOURCES = \
 	$(top_srcdir)/src/common/key2pho.c \
 	$(NULL)
 
-if MULTI_IM
+dump_database_SOURCES = \
+	dump_database.c \
+	$(NULL)
+
 all: $(noinst_PROGRAMS)
 	-mv -f gen_IM_data $(top_builddir)/data
 
+if MULTI_IM
 CLEANFILES = $(top_builddir)/data/gen_IM_data
 endif
