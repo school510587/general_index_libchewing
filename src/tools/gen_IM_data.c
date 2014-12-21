@@ -97,6 +97,12 @@ void find_keyin_sequence(const IntervalType range[], KeySeqWord keyin_buf[], int
 	else {
 		if (width == 0)
 			return;
+
+		if(num_phrase_data>=top_phrase_data){
+			fprintf(stderr, "Need to increase MAX_PHRASE_DATA to process\n");
+			exit(-1);
+		}
+
 		memcpy(phrase_data[num_phrase_data].phone, keyin_buf,
 			sizeof(phrase_data[num_phrase_data].phone));
 		++num_phrase_data;
