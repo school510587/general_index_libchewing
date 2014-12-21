@@ -8,7 +8,7 @@
 #define MAX_LINE_LEN        (1024)
 #define MAX_WORD_DATA      (60000)
 #define MAX_PHRASE_BUF_LEN      (149)
-#define MAX_PHRASE_DATA  (420000)
+#define MAX_PHRASE_DATA  (4200000)
 
 /**
  * @brief Record of each phrase in tsi.src
