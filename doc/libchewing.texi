@@ -660,7 +660,12 @@ value is @code{1}.
 
 @deftypefun void chewing_set_selKey (ChewingContext *@var{ctx}, const int *@var{selkeys}, int @var{len})
 This function sets the selection key to @var{selkeys}, an integer array of
-length @code{MAX_SELKEY}. The @var{len} is ignored by this function.
+length @code{len} containing ASCII character codes of selection keys. @var{len}
+must between @code{MIN_SELKEY} and @code{MAX_SELKEY}, and only printable ASCII
+characters except space are accepted.
+
+Note that the number of candidates per page is set to @var{len} if @var{len} is
+less than the number returned from function @code{chewing_get_candPerPage}.
 
 For example the default selection key is @code{1234567890}.
 @end deftypefun
