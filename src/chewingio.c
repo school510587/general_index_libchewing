@@ -484,6 +484,11 @@ CHEWING_API void chewing_set_selKey(ChewingContext *ctx, const int *selkeys, int
     if (MIN_SELKEY <= len && len <= MAX_SELKEY) {
         memset(ctx->data->config.selKey, 0, sizeof(ctx->data->config.selKey));
         memcpy(ctx->data->config.selKey, selkeys, sizeof(*selkeys) * len);
+        if (ctx->data->config.candPerPage > len) {
+            ctx->data->config.candPerPage = len;
+
+            LOG_VERBOSE("candPerPage is reduced to %d", ctx->data->config.candPerPage);
+        }
     }
 }
 
