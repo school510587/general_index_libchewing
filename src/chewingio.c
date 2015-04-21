@@ -482,6 +482,15 @@ CHEWING_API void chewing_set_selKey(ChewingContext *ctx, const int *selkeys, int
     }
 
     if (MIN_SELKEY <= len && len <= MAX_SELKEY) {
+        int i;
+
+        for (i = 0; i < len; i++) {
+            if (!isgraph(selkeys[i])) {
+                LOG_ERROR("selkeys[%d] = %d is illegal", i, selkeys[i]);
+                return;
+            }
+        }
+
         memset(ctx->data->config.selKey, 0, sizeof(ctx->data->config.selKey));
         memcpy(ctx->data->config.selKey, selkeys, sizeof(*selkeys) * len);
         if (ctx->data->config.candPerPage > len) {
