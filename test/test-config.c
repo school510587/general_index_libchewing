@@ -262,11 +262,44 @@ void test_selKey_candPerPage_exceptions()
     chewing_delete(ctx);
 }
 
+void test_set_illegal_selKey()
+{
+    ChewingContext *ctx;
+    int *select_key;
+    int selKey_code;
+
+    ctx = chewing_new();
+    start_testcase(ctx, fd);
+
+    /* Test from '\0' to space, select_key shall remain its default value */
+    for (selKey_code = '\0'; selKey_code <= ' '; ++selKey_code) {
+        chewing_set_selKey(ctx, &selKey_code, MIN_SELKEY);
+        select_key = chewing_get_selKey(ctx);
+        ok(select_key, "chewing_get_selKey shall not return NULL");
+        ok(!memcmp(select_key, DEFAULT_SELECT_KEY,
+                   sizeof(DEFAULT_SELECT_KEY)), "select key shall be default value");
+        ok(chewing_get_candPerPage(ctx) == DEFAULT_CAND_PER_PAGE, "candPerPage shall be %d", DEFAULT_CAND_PER_PAGE);
+        chewing_free(select_key);
+    }
+
+    selKey_code = 0xFF;
+    chewing_set_selKey(ctx, &selKey_code, MIN_SELKEY);
+    select_key = chewing_get_selKey(ctx);
+    ok(select_key, "chewing_get_selKey shall not return NULL");
+    ok(!memcmp(select_key, DEFAULT_SELECT_KEY,
+               sizeof(DEFAULT_SELECT_KEY)), "select key shall be default value");
+    ok(chewing_get_candPerPage(ctx) == DEFAULT_CAND_PER_PAGE, "candPerPage shall be %d", DEFAULT_CAND_PER_PAGE);
+    chewing_free(select_key);
+
+    chewing_delete(ctx);
+}
+
 void test_set_selKey()
 {
     test_set_selKey_normal();
     test_set_selKey_error_handling();
     test_selKey_candPerPage_exceptions();
+    test_set_illegal_selKey();
 }
 
 void test_set_addPhraseDirection()
