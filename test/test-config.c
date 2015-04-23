@@ -228,10 +228,45 @@ void test_set_selKey_error_handling()
     chewing_delete(ctx);
 }
 
+void test_selKey_candPerPage_exceptions()
+{
+    /* The first selection key is 'a', and other places are all 0 */
+    const int LESS_SELECT_KEY[MAX_SELKEY] = { ALTERNATE_SELECT_KEY[0] };
+
+    ChewingContext *ctx;
+    int *select_key;
+
+    ctx = chewing_new();
+    start_testcase(ctx, fd);
+
+    ok(chewing_get_candPerPage(ctx) == DEFAULT_CAND_PER_PAGE, "default candPerPage shall be %d", DEFAULT_CAND_PER_PAGE);
+
+    chewing_set_selKey(ctx, LESS_SELECT_KEY, MIN_SELKEY);
+    select_key = chewing_get_selKey(ctx);
+    ok(select_key, "chewing_get_selKey shall not return NULL");
+    ok(!memcmp(select_key, LESS_SELECT_KEY,
+               sizeof(LESS_SELECT_KEY)), "select key shall be LESS_SELECT_KEY");
+
+    /* candPerPage shall automatically be set to MIN_SELKEY */
+    ok(chewing_get_candPerPage(ctx) == MIN_SELKEY, "candPerPage shall be %d", MIN_SELKEY);
+
+    /* candPerPage shall remain MIN_SELKEY */
+    chewing_set_candPerPage(ctx, MAX_SELKEY);
+    ok(chewing_get_candPerPage(ctx) == MIN_SELKEY, "candPerPage shall be `%d'", MIN_SELKEY);
+
+    type_keystroke_by_string(ctx, DATA.token);
+    ok_preedit_buffer(ctx, DATA.expected);
+
+    chewing_free(select_key);
+
+    chewing_delete(ctx);
+}
+
 void test_set_selKey()
 {
     test_set_selKey_normal();
     test_set_selKey_error_handling();
+    test_selKey_candPerPage_exceptions();
 }
 
 void test_set_addPhraseDirection()
