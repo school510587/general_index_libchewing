@@ -260,6 +260,7 @@ set(ALL_TESTTOOLS
     performance
     randkeystroke
     simulate
+    stress
     testchewing
 )
 
