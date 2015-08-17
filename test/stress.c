@@ -96,7 +96,7 @@ int get_stdin()
     unsigned char c;
     int len = read(0, &c, 1);
     if (len <= 0)
-	return EOF;
+        return EOF;
     return c;
 }
 
@@ -109,23 +109,23 @@ int main(int argc, char *argv[])
     int (*get_input)() = &random256;
 
     for (i = 1; i < argc; i++) {
-	if (strcmp(argv[i], "-init") == 0)
-	    flag_random_init = 1;
-	else if (strcmp(argv[i], "-extra") == 0 && argv[i + 1])
-	    flag_random_extra = 1;
-	else if (strcmp(argv[i], "-loop") == 0 && argv[i + 1])
-	    flag_loop = atoi(argv[++i]);
-	else if (strcmp(argv[i], "-stdin") == 0)
-	    get_input = &get_stdin;
-	else {
-	    printf("Usage: %s [-init] [-extra] [-loop N] [-stdin]\n", argv[0]);
-	    printf("\t-init           Random initial configuration\n");
-	    printf("\t-extra          Random change all configurations during input.\n");
-	    printf("\t                This is usually unexpected.\n");
-	    printf("\t-stdin          Get random input from stdin\n");
-	    printf("\t-loop N         How many iterations to test (default infinite=-1)\n");
-	    exit(1);
-	}
+        if (strcmp(argv[i], "-init") == 0)
+            flag_random_init = 1;
+        else if (strcmp(argv[i], "-extra") == 0 && argv[i + 1])
+            flag_random_extra = 1;
+        else if (strcmp(argv[i], "-loop") == 0 && argv[i + 1])
+            flag_loop = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-stdin") == 0)
+            get_input = &get_stdin;
+        else {
+            printf("Usage: %s [-init] [-extra] [-loop N] [-stdin]\n", argv[0]);
+            printf("\t-init           Random initial configuration\n");
+            printf("\t-extra          Random change all configurations during input.\n");
+            printf("\t                This is usually unexpected.\n");
+            printf("\t-stdin          Get random input from stdin\n");
+            printf("\t-loop N         How many iterations to test (default infinite=-1)\n");
+            exit(1);
+        }
     }
 
     /* Initialize libchewing */
@@ -134,109 +134,109 @@ int main(int argc, char *argv[])
     putenv("CHEWING_USER_PATH=" TEST_HASH_DIR);
 
     for (i = 0; i != flag_loop; i++) {
-	ChewingContext *ctx = chewing_new();
+    ChewingContext *ctx = chewing_new();
 
-	/* typical configuration */
-	chewing_set_KBType(ctx, chewing_KBStr2Num("KB_DEFAULT"));
-	chewing_set_candPerPage(ctx, 9);
-	chewing_set_maxChiSymbolLen(ctx, 16);
-	chewing_set_addPhraseDirection(ctx, 1);
-	chewing_set_selKey(ctx, selKey_define, 10);
-	chewing_set_spaceAsSelection(ctx, 1);
+    /* typical configuration */
+    chewing_set_KBType(ctx, chewing_KBStr2Num("KB_DEFAULT"));
+    chewing_set_candPerPage(ctx, 9);
+    chewing_set_maxChiSymbolLen(ctx, 16);
+    chewing_set_addPhraseDirection(ctx, 1);
+    chewing_set_selKey(ctx, selKey_define, 10);
+    chewing_set_spaceAsSelection(ctx, 1);
 
-	if (flag_random_init) {
-	    chewing_set_KBType(ctx, get_input());
-	    chewing_set_candPerPage(ctx, get_input());
-	    chewing_set_maxChiSymbolLen(ctx, get_input());
-	    chewing_set_addPhraseDirection(ctx, get_input());
-	    chewing_set_selKey(ctx, selKey_define, get_input() % 11);
-	    chewing_set_spaceAsSelection(ctx, get_input());
-	    chewing_set_escCleanAllBuf(ctx, get_input());
-	    chewing_set_autoShiftCur(ctx, get_input());
-	    chewing_set_easySymbolInput(ctx, get_input());
-	    chewing_set_phraseChoiceRearward(ctx, get_input());
-	}
+    if (flag_random_init) {
+        chewing_set_KBType(ctx, get_input());
+        chewing_set_candPerPage(ctx, get_input());
+        chewing_set_maxChiSymbolLen(ctx, get_input());
+        chewing_set_addPhraseDirection(ctx, get_input());
+        chewing_set_selKey(ctx, selKey_define, get_input() % 11);
+        chewing_set_spaceAsSelection(ctx, get_input());
+        chewing_set_escCleanAllBuf(ctx, get_input());
+        chewing_set_autoShiftCur(ctx, get_input());
+        chewing_set_easySymbolInput(ctx, get_input());
+        chewing_set_phraseChoiceRearward(ctx, get_input());
+    }
 
-	while (1) {
-	    /* Random value: [0, max_key) for keys, [max_key, 0xff] for
-	     * configurations. Use a fixed range here because I don't want the
-	     * meaning of input changed a lot frequently if we add more keys in
-	     * the future. */
-	    const int max_key = 192;  /* arbitrary number */
-	    int v = get_input();
-	    if (v == EOF)
-		break;
-	    assert(max_key * sizeof(all_key[0]) >= sizeof(all_key));
-	    if (v >= max_key) {
-		const int typical = 2;
-		int handled = 1;
-		v = v - max_key;
-		if (flag_random_extra || v < typical) {
-		    switch (v) {
-			/* typical configurations may be changed during input */
-			case 0:
-			    chewing_set_ChiEngMode(ctx, get_input());
-			    break;
-			case 1:
-			    chewing_set_ShapeMode(ctx, get_input());
-			    break;
+    while (1) {
+        /* Random value: [0, max_key) for keys, [max_key, 0xff] for
+         * configurations. Use a fixed range here because I don't want the
+         * meaning of input changed a lot frequently if we add more keys in
+         * the future. */
+        const int max_key = 192;  /* arbitrary number */
+        int v = get_input();
+        if (v == EOF)
+        break;
+        assert(max_key * sizeof(all_key[0]) >= sizeof(all_key));
+        if (v >= max_key) {
+        const int typical = 2;
+        int handled = 1;
+        v = v - max_key;
+        if (flag_random_extra || v < typical) {
+            switch (v) {
+            /* typical configurations may be changed during input */
+            case 0:
+                chewing_set_ChiEngMode(ctx, get_input());
+                break;
+            case 1:
+                chewing_set_ShapeMode(ctx, get_input());
+                break;
 
-			/* usually not changed during input */
-			case 2:
-			    chewing_set_KBType(ctx, get_input());
-			    break;
-			case 3:
-			    chewing_set_candPerPage(ctx, get_input());
-			    break;
-			case 4:
-			    chewing_set_maxChiSymbolLen(ctx, get_input());
-			    break;
-			case 5:
-			    chewing_set_addPhraseDirection(ctx, get_input());
-			    break;
-			case 6:
-			    chewing_set_selKey(ctx, selKey_define, get_input() % 11);
-			    break;
-			case 7:
-			    chewing_set_spaceAsSelection(ctx, get_input());
-			    break;
-			case 8:
-			    chewing_set_escCleanAllBuf(ctx, get_input());
-			    break;
-			case 9:
-			    chewing_set_autoShiftCur(ctx, get_input());
-			    break;
-			case 10:
-			    chewing_set_easySymbolInput(ctx, get_input());
-			    break;
-			case 11:
-			    chewing_set_phraseChoiceRearward(ctx, get_input());
-			    break;
-			default:
-			    handled = 0;
-			    break;
-		    }
-		} else {
-		    handled = 0;
-		}
-		if (!handled)
-		    break;
-	    } else {
-		if (0 <= v && v < max_key) {
-		    int key = all_key[v];
-		    type_single_keystroke(ctx, key);
-		} else {
-		    break;
-		}
-	    }
-	    commit_string(ctx);
-	}
-	chewing_delete(ctx);
+            /* usually not changed during input */
+            case 2:
+                chewing_set_KBType(ctx, get_input());
+                break;
+            case 3:
+                chewing_set_candPerPage(ctx, get_input());
+                break;
+            case 4:
+                chewing_set_maxChiSymbolLen(ctx, get_input());
+                break;
+            case 5:
+                chewing_set_addPhraseDirection(ctx, get_input());
+                break;
+            case 6:
+                chewing_set_selKey(ctx, selKey_define, get_input() % 11);
+                break;
+            case 7:
+                chewing_set_spaceAsSelection(ctx, get_input());
+                break;
+            case 8:
+                chewing_set_escCleanAllBuf(ctx, get_input());
+                break;
+            case 9:
+                chewing_set_autoShiftCur(ctx, get_input());
+                break;
+            case 10:
+                chewing_set_easySymbolInput(ctx, get_input());
+                break;
+            case 11:
+                chewing_set_phraseChoiceRearward(ctx, get_input());
+                break;
+            default:
+                handled = 0;
+                break;
+            }
+        } else {
+            handled = 0;
+        }
+        if (!handled)
+            break;
+        } else {
+        if (0 <= v && v < max_key) {
+            int key = all_key[v];
+            type_single_keystroke(ctx, key);
+        } else {
+            break;
+        }
+        }
+        commit_string(ctx);
+    }
+    chewing_delete(ctx);
 
-	if (i % 10000 == 0)
-	    printf("%zu\n", i);
-	if (getenv("AFL_PERSISTENT"))
-	    raise(SIGSTOP);
+    if (i % 10000 == 0)
+        printf("%zu\n", i);
+    if (getenv("AFL_PERSISTENT"))
+        raise(SIGSTOP);
     }
 
     return 0;
